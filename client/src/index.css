@@ -279,29 +279,48 @@
 /* Toast Notification Utility */
 .toast {
   position: fixed;
-  bottom: 80px;
+  top: 80px;
   left: 50%;
-  transform: translateX(-50%) translateY(100px);
+  transform: translateX(-50%) translateY(-100px);
   opacity: 0;
-  background: rgba(36, 40, 59, 0.95);
-  border: 1px solid var(--color-green);
-  color: var(--color-green);
+  background: rgba(15, 15, 27, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-fg);
   padding: 12px 24px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   z-index: 1000;
-  box-shadow: 0 8px 32px rgba(158, 206, 106, 0.25);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   pointer-events: none;
+  backdrop-filter: blur(12px);
 }
 
 .toast.show {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
+}
+
+.toast.success {
+  border-color: var(--color-green);
+  color: var(--color-green);
+  box-shadow: 0 0 20px rgba(158, 206, 106, 0.2);
+}
+
+.toast.warning {
+  border-color: var(--color-yellow);
+  color: var(--color-yellow);
+  box-shadow: 0 0 20px rgba(224, 175, 104, 0.2);
+}
+
+.toast.error {
+  border-color: var(--color-red);
+  color: var(--color-red);
+  box-shadow: 0 0 20px rgba(247, 118, 142, 0.2);
 }
 
 .toast svg {

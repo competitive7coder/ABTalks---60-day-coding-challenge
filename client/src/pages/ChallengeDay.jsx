@@ -23,6 +23,7 @@ export default function ChallengeDay() {
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success'); // 'success' | 'warning' | 'error'
 
   const [user, setUser] = useState(null);
   const [task, setTask] = useState(null);
@@ -54,6 +55,7 @@ export default function ChallengeDay() {
   const handleSub = async (e) => {
     e.preventDefault();
     if (!githubUrl || !linkedinUrl) {
+      setToastType('warning');
       setToastMessage("Please provide both your GitHub commit and LinkedIn post URL.");
       setShowToast(true);
       setTimeout(() => setShowToast(false), 4000);
@@ -71,6 +73,7 @@ export default function ChallengeDay() {
         linkedin_post: linkedinUrl
       });
 
+      setToastType('success');
       setToastMessage(`Day ${currentDayNum} completed! Streak saved.`);
       setShowToast(true);
 
@@ -86,6 +89,7 @@ export default function ChallengeDay() {
         setShowToast(false);
       }, 4000);
     } catch (err) {
+      setToastType('error');
       setToastMessage(err.message || 'Error submitting challenge day task.');
       setShowToast(true);
       setTimeout(() => setShowToast(false), 4000);
@@ -348,7 +352,7 @@ export default function ChallengeDay() {
       </nav>
 
       {/* Floating success toast */}
-      <div className={`toast ${showToast ? 'show' : ''}`} id="toast">
+      <div className={`toast ${showToast ? 'show' : ''} ${toastType}`} id="toast">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" /></svg>
         {toastMessage}
       </div>
