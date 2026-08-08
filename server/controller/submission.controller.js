@@ -1,118 +1,136 @@
-import challengeModel from "../model/challenge.model.js";
 import submissionModel from "../model/submisson.model.js";
+import challengeModel from "../model/challenge.model.js";
 import userModel from "../model/user.model.js";
 
-export const createSubmission = async (req, res) => {
+export const submitChallenge = async (req, res) => {
     try {
-        const {
-            challengeId,
+        const userId = req.userId;
+        const { day, github_repo, github_commit, linkedin_post, deployment_url } = req.body || {};
+
+        if (!day || !github_repo || !github_commit || !linkedin_post) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide day, github_repo, github_commit and linkedin_post",
+            });
+        }
+
+        // Link Detector / Domain Verification
+        if (!github_repo.toLowerCase().includes("github.com")) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid GitHub URL. Must contain 'github.com'."
+            });
+        }
+
+        if (!linkedin_post.toLowerCase().includes("linkedin.com")) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid LinkedIn URL. Must contain 'linkedin.com'."
+            });
+        }
+
+        // Find user's active challenge
+        const challenge = await challengeModel.findOne({ userId });
+        if (!challenge) {
+            return res.status(404).json({
+                success: false,
+                message: "No active challenge found for this user. Please start a track first.",
+            });
+        }
+
+        // Check if this exact repository commit or linkedin link was already submitted on another day
+        const duplicateLink = await submissionModel.findOne({
+            userId,
+            $or: [
+                {
+                    $and: [
+                        { github_repo: github_repo },
+                        { github_commit: github_commit }
+                    ]
+                },
+                { linkedin_post: linkedin_post }
+            ]
+        });
+
+        if (duplicateLink) {
+            return res.status(400).json({
+                success: false,
+                message: "You have already submitted this GitHub commit or LinkedIn post for another day. Submissions must be unique."
+            });
+        }
+
+        // Check if submission already exists for this day
+        const existingSubmission = await submissionModel.findOne({
+            userId,
+            challengeId: challenge._id,
+            day,
+        });
+
+        if (existingSubmission) {
+            return res.status(400).json({
+                success: false,
+                message: `You have already submitted your work for Day ${day}`,
+            });
+        }
+
+        // Create new submission
+        const submission = await submissionModel.create({
+            userId,
+            challengeId: challenge._id,
             day,
             github_repo,
             github_commit,
             linkedin_post,
-            deployment_url,
-        } = req.body || {};
-
-        const userId = req.userId;
-
-        // Check required fields
-        if (
-            !challengeId ||
-            !day ||
-            !github_repo ||
-            !github_commit ||
-            !linkedin_post
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "All submission fields are required",
-            });
-        }
-
-        // Check challenge belongs to logged-in user
-        const challenge = await challengeModel.findOne({
-            _id: challengeId,
-            userId,
+            deployment_url: deployment_url || "",
         });
 
-        if (!challenge) {
-            return res.status(404).json({
-                success: false,
-                message: "Challenge not found",
-            });
-        }
-
-        // Check valid day
-        const challengeDay = challenge.roadmap.find(
-            (item) => item.day === Number(day)
-        );
-
-        if (Number(day) > challenge.current_day) {
-            return res.status(400).json({
-                success: false,
-                message: `You must complete Day ${challenge.current_day} first`,
-            });
-        }
-
-        if (!challengeDay) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid challenge day",
-            });
-        }
-
-        // Create submission
-        const submission = await submissionModel.create({
-            userId,
-            challengeId,
-            day: Number(day),
-            github_repo,
-            github_commit,
-            linkedin_post,
-            deployment_url,
-        });
-
-        if (challenge.current_day === challenge.total_day) {
-            challenge.completed = true;
-        } else {
-            challenge.current_day += 1;
-        }
-
-        const user = await userModel.findById(userId)
-
+        // Update User streak stats
+        const user = await userModel.findById(userId);
         if (user) {
-            user.current_streak += 1
+            // Increment current streak if submitting the active day
+            if (day === challenge.current_day) {
+                user.current_streak += 1;
+                if (user.current_streak > user.longest_streak) {
+                    user.longest_streak = user.current_streak;
+                }
+                await user.save();
 
-            if (user.current_streak > user.longest_streak) {
-                user.longest_streak = user.current_streak
+                // Increment challenge day
+                if (challenge.current_day < 60) {
+                    challenge.current_day += 1;
+                    await challenge.save();
+                }
             }
-
-            await Promise.all([
-                user.save(),
-                challenge.save()
-            ])
-        }
-        else {
-            await challenge.save()
         }
 
         return res.status(201).json({
             success: true,
-            message: "Submission created successfully",
+            message: `Day ${day} submitted successfully!`,
             submission,
         });
+
     } catch (error) {
-
-        if (error.code === 11000) {
-            return res.status(400).json({
-                success: false,
-                message: "You have already submitted this day",
-            });
-        }
-
         return res.status(500).json({
             success: false,
-            message: "Server error",
+            message: error.message || "Server error while creating submission",
         });
     }
 };
+
+export const getUserSubmissions = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const submissions = await submissionModel.find({ userId });
+        return res.status(200).json({
+            success: true,
+            submissions,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Server error while fetching submissions",
+        });
+    }
+};
+
+export const createSubmission = submitChallenge;
