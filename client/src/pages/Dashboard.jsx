@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getCurrentUser, getCurrentChallenge, getSubmissions, createChallenge, getLeaderboard, logOut } from '../api';
-import { 
-  Home, 
-  Trophy, 
-  User, 
-  Flame, 
-  ClipboardCheck, 
-  Award, 
-  Github, 
-  Linkedin, 
-  LogOut, 
-  Users, 
-  CheckCircle2, 
+import {
+  Home,
+  Trophy,
+  User,
+  Flame,
+  ClipboardCheck,
+  Award,
+  LogOut,
+  Users,
+  CheckCircle2,
   Sparkles,
   Zap,
   TrendingUp,
   Shield
 } from 'lucide-react';
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -64,7 +63,7 @@ export default function Dashboard() {
       try {
         const userRes = await getCurrentUser();
         setUser(userRes.data);
-        
+
         let challengeData;
         try {
           const challengeRes = await getCurrentChallenge();
@@ -179,8 +178,8 @@ export default function Dashboard() {
             <span className="tracking-wide text-transparent bg-clip-text bg-linear-to-r from-blue via-purple to-cyan">ABTalks</span>
           </div>
           <div className="flex items-center gap-3">
-            <div 
-              className={`w-8.5 h-8.5 rounded-lg bg-linear-to-br from-blue to-purple flex items-center justify-center font-bold text-[11px] text-bg border-2 transition-all duration-300 cursor-pointer ${activeTab === 'profile' ? 'border-purple scale-110 shadow-purple-glow' : 'border-blue/45 hover:scale-105'}`} 
+            <div
+              className={`w-8.5 h-8.5 rounded-lg bg-linear-to-br from-blue to-purple flex items-center justify-center font-bold text-[11px] text-bg border-2 transition-all duration-300 cursor-pointer ${activeTab === 'profile' ? 'border-purple scale-110 shadow-purple-glow' : 'border-blue/45 hover:scale-105'}`}
               onClick={() => setActiveTab('profile')}
             >
               {initials}
@@ -200,24 +199,24 @@ export default function Dashboard() {
               </span>
               <h2 className="text-base font-extrabold text-fg mb-1">Select Your Cohort Track</h2>
               <p className="text-xs text-fg-dark mb-6">You do not have an active track yet. Choose one to initialize your 60-day roadmap.</p>
-              
+
               <div className="flex flex-col gap-3.5 text-left mb-6">
-                <div 
-                  onClick={() => setSelectedTrack('Full Stack')} 
+                <div
+                  onClick={() => setSelectedTrack('Full Stack')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Full Stack' ? 'bg-blue/10 border-blue shadow-[0_0_15px_var(--blue-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Full Stack (Web Dev)</h4>
                   <p className="text-[10px] text-fg-dark">Curriculum covering React, Node.js, Express, and Database development.</p>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('Backend')} 
+                <div
+                  onClick={() => setSelectedTrack('Backend')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Backend' ? 'bg-purple/10 border-purple shadow-[0_0_15px_var(--purple-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Backend (AI/ML & DSA)</h4>
                   <p className="text-[10px] text-fg-dark">Core algorithms, systems architecture, and machine learning models.</p>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('Frontend')} 
+                <div
+                  onClick={() => setSelectedTrack('Frontend')}
                   className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Frontend' ? 'bg-cyan/10 border-cyan shadow-[0_0_15px_var(--cyan-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Frontend (Mobile & UI)</h4>
@@ -225,7 +224,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleInitChallenge}
                 disabled={initializing}
                 className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 shadow-blue-glow transition-all duration-300 cursor-pointer uppercase tracking-wider"
@@ -240,183 +239,183 @@ export default function Dashboard() {
               <div className="py-1 flex items-center gap-2">
                 <div>
                   <h1 className="text-lg font-extrabold mb-0.5 flex items-center gap-1.5">
-                    Hey {user?.name}! 
+                    Hey {user?.name}!
                     <Flame className="w-4.5 h-4.5 text-orange fill-orange animate-pulse" />
                   </h1>
                   <p className="text-fg-dark text-[11px]">You're on fire â€” Day {displayDay} of 60</p>
                 </div>
               </div>
 
-            {/* Streak Card */}
-            <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-3 relative z-10">
-                <div>
-                  <h2 className="text-[9px] text-blue font-bold tracking-wider uppercase mb-1 flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5" /> Current Streak
-                  </h2>
-                  <div className="text-4xl font-black bg-linear-to-r from-blue to-cyan bg-clip-text text-transparent">{displayStreak}</div>
-                  <div className="text-fg-dark text-[10px] mt-1">
-                    days strong · Best: {user?.longest_streak || 0}
+              {/* Streak Card */}
+              <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
+                <div className="flex justify-between items-start mb-3 relative z-10">
+                  <div>
+                    <h2 className="text-[9px] text-blue font-bold tracking-wider uppercase mb-1 flex items-center gap-1">
+                      <TrendingUp className="w-3.5 h-3.5" /> Current Streak
+                    </h2>
+                    <div className="text-4xl font-black bg-linear-to-r from-blue to-cyan bg-clip-text text-transparent">{displayStreak}</div>
+                    <div className="text-fg-dark text-[10px] mt-1">
+                      days strong · Best: {user?.longest_streak || 0}
+                    </div>
+                  </div>
+                  <div className="text-3xl filter drop-shadow-orange-glow anim-flame">
+                    <Flame className="w-9 h-9 text-orange fill-orange" />
                   </div>
                 </div>
-                <div className="text-3xl filter drop-shadow-orange-glow anim-flame">
-                  <Flame className="w-9 h-9 text-orange fill-orange" />
+                <div className="calendar relative z-10">
+                  {renderedDays.map((day) => (
+                    <div
+                      key={day.day}
+                      className={`calendar-day ${day.completed ? 'day-done' : ''} ${day.missed ? 'day-missed' : ''} ${day.current ? 'day-today' : ''} ${day.upcoming ? 'day-upcoming' : 'day-empty'}`}
+                      onClick={() => navigate(`/day/${day.day}`)}
+                      style={{ fontSize: day.completed ? '14px' : '9px' }}
+                    >
+                      {day.completed ? '🔥' : day.day}
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="calendar relative z-10">
-                {renderedDays.map((day) => (
-                  <div
-                    key={day.day}
-                    className={`calendar-day ${day.completed ? 'day-done' : ''} ${day.missed ? 'day-missed' : ''} ${day.current ? 'day-today' : ''} ${day.upcoming ? 'day-upcoming' : 'day-empty'}`}
-                    onClick={() => navigate(`/day/${day.day}`)}
-                    style={{ fontSize: day.completed ? '14px' : '9px' }}
-                  >
-                    {day.completed ? '🔥' : day.day}
-                  </div>
-                ))}
-              </div>
-            </div>
 
-            {/* Today's Task */}
-            <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
-              <div className="flex justify-between items-center mb-2.5">
-                <span className="inline-flex items-center gap-1.5 bg-blue/12 text-blue px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                  <Sparkles className="w-3 h-3" /> {challenge?.challenge_name} Track
-                </span>
-                <span className="text-fg-dark text-[9px] flex items-center gap-1">
-                  ~2 hrs
-                </span>
-              </div>
-              <h3 className="text-sm font-bold mb-1 leading-snug">{currentTask.task || "Start Coding..."}</h3>
-              <p className="text-fg-dark text-[11px] leading-relaxed mb-2.5">{currentTask.description || "Deploy daily commits to secure your coding streaks."}</p>
-              <div className="flex gap-3 mb-4 flex-wrap">
-                <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                  <Zap className="w-3.5 h-3.5 text-yellow" /> {currentTask.difficulty_level || "Medium"}
-                </span>
-                <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                  💻 {(() => {
-                    const name = challenge?.challenge_name || '';
-                    if (name === 'Frontend') return 'React, CSS';
-                    if (name === 'Backend') return 'Node, DB';
-                    if (name === 'AI/ML') return 'Python, PyTorch';
-                    if (name === 'DSA') return 'C++, Java';
-                    if (name === 'Mobile') return 'React Native';
-                    if (name === 'Full Stack') return 'MERN Stack';
-                    return 'Core Tech';
-                  })()}
-                </span>
-                <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                  🎯 Deploy
-                </span>
-              </div>
-              {isCompleted ? (
-                <button className="w-full py-3.5 bg-linear-to-r from-green to-[#9ece6acc] text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1" onClick={() => navigate(`/day/${displayDay}`)}>
-                  <CheckCircle2 className="w-4 h-4" /> challenge_completed
-                </button>
-              ) : (
-                <button className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] transition-all duration-300 cursor-pointer anim-gradient" onClick={() => navigate(`/day/${displayDay}`)}>
-                  Start Day {displayDay} →
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            {/* Progress */}
-            <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xs font-bold">Challenge Progress</h3>
-                <span className="text-xs font-extrabold text-blue">{progressPercent}%</span>
-              </div>
-              <div className="h-1.5 bg-fg/6 rounded-full overflow-hidden mb-1.5 relative">
-                <div className="h-full bg-linear-to-r from-blue via-purple to-cyan anim-gradient transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
-              </div>
-              <div className="flex justify-between text-[9px] text-fg-dark">
-                <span>Day {isCompleted ? displayDay : displayDay - 1}</span>
-                <span>Day 60</span>
-              </div>
-            </div>
-
-            {/* Peer Pod */}
-            <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-              <div className="flex justify-between items-center mb-2.5">
-                <h3 className="text-xs font-bold flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue" /> Your Peer Pod
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-green rounded-full relative after:content-[''] after:absolute after:-inset-0.5 after:rounded-full after:bg-green anim-ring-pulse"></span>
+              {/* Today's Task */}
+              <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
+                <div className="flex justify-between items-center mb-2.5">
+                  <span className="inline-flex items-center gap-1.5 bg-blue/12 text-blue px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
+                    <Sparkles className="w-3 h-3" /> {challenge?.challenge_name} Track
                   </span>
-                </h3>
-                <span className="text-[9px] text-fg-dark">3 online</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-red to-orange">AS</div>
-                  <div className="flex-1">
-                    <h4 className="text-[11px] font-bold text-fg mb-0.5">Ananya Sharma</h4>
-                    <p className="text-[9px] text-fg-dark">Just submitted Day 12 · 2m ago</p>
-                  </div>
-                  <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                    <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 14
-                  </div>
+                  <span className="text-fg-dark text-[9px] flex items-center gap-1">
+                    ~2 hrs
+                  </span>
                 </div>
-                <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-green to-cyan">VP</div>
-                  <div className="flex-1">
-                    <h4 className="text-[11px] font-bold text-fg mb-0.5">Vikram Patel</h4>
-                    <p className="text-[9px] text-fg-dark">Working on Day 12 · 15m ago</p>
-                  </div>
-                  <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                    <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 11
-                  </div>
+                <h3 className="text-sm font-bold mb-1 leading-snug">{currentTask.task || "Start Coding..."}</h3>
+                <p className="text-fg-dark text-[11px] leading-relaxed mb-2.5">{currentTask.description || "Deploy daily commits to secure your coding streaks."}</p>
+                <div className="flex gap-3 mb-4 flex-wrap">
+                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                    <Zap className="w-3.5 h-3.5 text-yellow" /> {currentTask.difficulty_level || "Medium"}
+                  </span>
+                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                    💻 {(() => {
+                      const name = challenge?.challenge_name || '';
+                      if (name === 'Frontend') return 'React, CSS';
+                      if (name === 'Backend') return 'Node, DB';
+                      if (name === 'AI/ML') return 'Python, PyTorch';
+                      if (name === 'DSA') return 'C++, Java';
+                      if (name === 'Mobile') return 'React Native';
+                      if (name === 'Full Stack') return 'MERN Stack';
+                      return 'Core Tech';
+                    })()}
+                  </span>
+                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                    🎯 Deploy
+                  </span>
                 </div>
-                <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-purple to-magenta">SK</div>
-                  <div className="flex-1">
-                    <h4 className="text-[11px] font-bold text-fg mb-0.5">Sneha Kumar</h4>
-                    <p className="text-[9px] text-fg-dark">Completed Day 11 · 1h ago</p>
-                  </div>
-                  <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                    <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 9
-                  </div>
-                </div>
+                {isCompleted ? (
+                  <button className="w-full py-3.5 bg-linear-to-r from-green to-[#9ece6acc] text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1" onClick={() => navigate(`/day/${displayDay}`)}>
+                    <CheckCircle2 className="w-4 h-4" /> challenge_completed
+                  </button>
+                ) : (
+                  <button className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] transition-all duration-300 cursor-pointer anim-gradient" onClick={() => navigate(`/day/${displayDay}`)}>
+                    Start Day {displayDay} →
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Achievements */}
-            <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-              <h3 className="text-xs font-bold mb-2.5 flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-purple" /> Achievements
-              </h3>
-              <div className="grid grid-cols-4 gap-2">
-                <div className="text-center group cursor-pointer">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-orange/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300">
-                    <Flame className="w-5 h-5 text-orange fill-orange" />
-                  </div>
-                  <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">7-Day</p>
+            <div className="flex flex-col gap-3">
+              {/* Progress */}
+              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-xs font-bold">Challenge Progress</h3>
+                  <span className="text-xs font-extrabold text-blue">{progressPercent}%</span>
                 </div>
-                <div className="text-center group cursor-pointer">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-green/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300 text-xs">
-                    🚀
-                  </div>
-                  <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Deploy</p>
+                <div className="h-1.5 bg-fg/6 rounded-full overflow-hidden mb-1.5 relative">
+                  <div className="h-full bg-linear-to-r from-blue via-purple to-cyan anim-gradient transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
                 </div>
-                <div className="text-center badge-locked">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
-                    💎
-                  </div>
-                  <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">30-Day</p>
+                <div className="flex justify-between text-[9px] text-fg-dark">
+                  <span>Day {isCompleted ? displayDay : displayDay - 1}</span>
+                  <span>Day 60</span>
                 </div>
-                <div className="text-center badge-locked">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
-                    👑
+              </div>
+
+              {/* Peer Pod */}
+              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                <div className="flex justify-between items-center mb-2.5">
+                  <h3 className="text-xs font-bold flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue" /> Your Peer Pod
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-green rounded-full relative after:content-[''] after:absolute after:-inset-0.5 after:rounded-full after:bg-green anim-ring-pulse"></span>
+                    </span>
+                  </h3>
+                  <span className="text-[9px] text-fg-dark">3 online</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-red to-orange">AS</div>
+                    <div className="flex-1">
+                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Ananya Sharma</h4>
+                      <p className="text-[9px] text-fg-dark">Just submitted Day 12 · 2m ago</p>
+                    </div>
+                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 14
+                    </div>
                   </div>
-                  <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Top 10%</p>
+                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-green to-cyan">VP</div>
+                    <div className="flex-1">
+                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Vikram Patel</h4>
+                      <p className="text-[9px] text-fg-dark">Working on Day 12 · 15m ago</p>
+                    </div>
+                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 11
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-purple to-magenta">SK</div>
+                    <div className="flex-1">
+                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Sneha Kumar</h4>
+                      <p className="text-[9px] text-fg-dark">Completed Day 11 · 1h ago</p>
+                    </div>
+                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 9
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Achievements */}
+              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                <h3 className="text-xs font-bold mb-2.5 flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-purple" /> Achievements
+                </h3>
+                <div className="grid grid-cols-4 gap-2">
+                  <div className="text-center group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-orange/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300">
+                      <Flame className="w-5 h-5 text-orange fill-orange" />
+                    </div>
+                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">7-Day</p>
+                  </div>
+                  <div className="text-center group cursor-pointer">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-green/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300 text-xs">
+                      🚀
+                    </div>
+                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Deploy</p>
+                  </div>
+                  <div className="text-center badge-locked">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
+                      💎
+                    </div>
+                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">30-Day</p>
+                  </div>
+                  <div className="text-center badge-locked">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
+                      👑
+                    </div>
+                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Top 10%</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
 
       {/* 2. LEADERBOARD TAB */}
       {activeTab === 'board' && (
@@ -476,7 +475,7 @@ export default function Dashboard() {
                     </div>
                     <span className="text-[7px] text-slate-500 uppercase tracking-wider mb-1.5 truncate w-full text-center">{combinedLeaderboard[1].track}</span>
                     <div className="w-full rounded-t-lg flex items-center justify-center"
-                      style={{ height:'52px', background:'linear-gradient(180deg,rgba(148,163,184,0.14) 0%,rgba(148,163,184,0.04) 100%)', border:'1px solid rgba(148,163,184,0.18)', borderBottom:'none' }}>
+                      style={{ height: '52px', background: 'linear-gradient(180deg,rgba(148,163,184,0.14) 0%,rgba(148,163,184,0.04) 100%)', border: '1px solid rgba(148,163,184,0.18)', borderBottom: 'none' }}>
                       <span className="text-slate-400 text-base font-black">2</span>
                     </div>
                   </div>
@@ -489,7 +488,7 @@ export default function Dashboard() {
                         style={{ background: 'linear-gradient(135deg,#fde047 0%,#f97316 100%)' }}>
                         {combinedLeaderboard[0].initials}
                       </div>
-                      <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ boxShadow:'0 0 18px rgba(250,204,21,0.3)', border:'1px solid rgba(250,204,21,0.18)' }}></div>
+                      <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ boxShadow: '0 0 18px rgba(250,204,21,0.3)', border: '1px solid rgba(250,204,21,0.18)' }}></div>
                     </div>
                     <p className="text-[9.5px] font-black text-yellow text-center truncate w-full mb-0.5 px-1">{combinedLeaderboard[0].name}</p>
                     <div className="flex items-center gap-0.5 text-[9px] text-orange font-black mb-1">
@@ -497,7 +496,7 @@ export default function Dashboard() {
                     </div>
                     <span className="text-[7px] text-yellow/40 uppercase tracking-wider mb-1.5 truncate w-full text-center">{combinedLeaderboard[0].track}</span>
                     <div className="w-full rounded-t-xl flex items-center justify-center"
-                      style={{ height:'76px', background:'linear-gradient(180deg,rgba(250,204,21,0.16) 0%,rgba(250,204,21,0.04) 100%)', border:'1px solid rgba(250,204,21,0.22)', borderBottom:'none', boxShadow:'0 -8px 24px rgba(250,204,21,0.07)' }}>
+                      style={{ height: '76px', background: 'linear-gradient(180deg,rgba(250,204,21,0.16) 0%,rgba(250,204,21,0.04) 100%)', border: '1px solid rgba(250,204,21,0.22)', borderBottom: 'none', boxShadow: '0 -8px 24px rgba(250,204,21,0.07)' }}>
                       <span className="text-yellow text-2xl font-black drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]">1</span>
                     </div>
                   </div>
@@ -517,20 +516,20 @@ export default function Dashboard() {
                     </div>
                     <span className="text-[7px] text-amber-700 uppercase tracking-wider mb-1.5 truncate w-full text-center">{combinedLeaderboard[2].track}</span>
                     <div className="w-full rounded-t-lg flex items-center justify-center"
-                      style={{ height:'36px', background:'linear-gradient(180deg,rgba(217,119,6,0.14) 0%,rgba(217,119,6,0.04) 100%)', border:'1px solid rgba(217,119,6,0.18)', borderBottom:'none' }}>
+                      style={{ height: '36px', background: 'linear-gradient(180deg,rgba(217,119,6,0.14) 0%,rgba(217,119,6,0.04) 100%)', border: '1px solid rgba(217,119,6,0.18)', borderBottom: 'none' }}>
                       <span className="text-amber-500 text-base font-black">3</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Stage base shimmer */}
-                <div className="h-[3px] w-full shrink-0" style={{ background:'linear-gradient(to right, rgba(148,163,184,0.4), rgba(250,204,21,0.7), rgba(217,119,6,0.4))' }}></div>
+                <div className="h-[3px] w-full shrink-0" style={{ background: 'linear-gradient(to right, rgba(148,163,184,0.4), rgba(250,204,21,0.7), rgba(217,119,6,0.4))' }}></div>
               </div>
             )}
 
             {/* RIGHT: Scrollable Rankings */}
             <div className="rounded-2xl border border-border-light flex flex-col overflow-hidden min-h-0"
-              style={{ background:'rgba(12,12,22,0.85)', backdropFilter:'blur(12px)' }}>
+              style={{ background: 'rgba(12,12,22,0.85)', backdropFilter: 'blur(12px)' }}>
 
               {/* Sticky header */}
               <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/5 shrink-0">
@@ -544,12 +543,11 @@ export default function Dashboard() {
                 {combinedLeaderboard.map((peer, idx) => {
                   const medals = ['🥇', '🥈', '🥉'];
                   const isTop3 = idx < 3;
-                  const topBorderColor = ['border-l-yellow/70','border-l-slate-400/60','border-l-amber-500/60'];
+                  const topBorderColor = ['border-l-yellow/70', 'border-l-slate-400/60', 'border-l-amber-500/60'];
                   return (
                     <div key={peer.name}
-                      className={`flex items-center gap-2.5 px-3 py-2 border-b border-white/4 border-l-2 transition-all duration-200 hover:bg-white/4 cursor-pointer group ${
-                        isTop3 ? topBorderColor[idx] : 'border-l-transparent hover:border-l-blue/30'
-                      }`}
+                      className={`flex items-center gap-2.5 px-3 py-2 border-b border-white/4 border-l-2 transition-all duration-200 hover:bg-white/4 cursor-pointer group ${isTop3 ? topBorderColor[idx] : 'border-l-transparent hover:border-l-blue/30'
+                        }`}
                     >
                       <div className="w-5 shrink-0 text-center">
                         {isTop3
@@ -607,8 +605,8 @@ export default function Dashboard() {
                     👑 Admin Console
                   </h3>
                   <p className="text-[11px] text-fg-dark mb-4">You have administrative privileges to manage challenge roadmap tasks.</p>
-                  <button 
-                    onClick={() => navigate('/admin')} 
+                  <button
+                    onClick={() => navigate('/admin')}
                     className="w-full py-3.5 bg-purple/10 border border-purple/35 text-purple font-bold rounded-xl text-xs hover:bg-purple hover:text-bg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2"
                   >
                     Go to Admin Panel
@@ -622,8 +620,8 @@ export default function Dashboard() {
                   <LogOut className="w-4 h-4 text-red" /> Session management
                 </h3>
                 <p className="text-[11px] text-fg-dark mb-4">Disconnecting will log you out of your current cohort session.</p>
-                <button 
-                  onClick={handleLogout} 
+                <button
+                  onClick={handleLogout}
                   className="w-full py-3.5 bg-red/10 border border-red/35 text-red font-bold rounded-xl text-xs hover:bg-red hover:text-bg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2"
                 >
                   <LogOut className="w-3.5 h-3.5" /> $ disconnect_session --terminate
@@ -657,13 +655,13 @@ export default function Dashboard() {
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
                     <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
-                      <Github className="w-4 h-4 text-fg" /> GitHub Profile
+                      <FaGithub className="w-4 h-4 text-fg" /> GitHub Profile
                     </span>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
                     <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
-                      <Linkedin className="w-4 h-4 text-blue" /> LinkedIn Profile
+                      <FaLinkedin className="w-4 h-4 text-blue" /> LinkedIn Profile
                     </span>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>

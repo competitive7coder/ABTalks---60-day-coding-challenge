@@ -7,12 +7,11 @@ import {
   User, 
   Flame, 
   ClipboardCheck, 
-  Github, 
-  Linkedin, 
   CheckCircle2, 
   Sparkles,
   Zap
 } from 'lucide-react';
+import { FaGithub, FaLinkedin } from "react-icons/fa";
 
 export default function ChallengeDay() {
   const navigate = useNavigate();
