@@ -6,17 +6,14 @@ const dailyTaskSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
     task: {
       type: String,
       required: true,
     },
-
     description: {
       type: String,
       default: "",
     },
-
     difficulty_level: {
       type: String,
       enum: ["Easy", "Medium", "Hard"],
@@ -35,28 +32,23 @@ const challengeSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-
     challenge_name: {
       type: String,
       enum: ["Frontend", "Backend", "Full Stack"],
       required: true,
     },
-
     total_day: {
       type: Number,
       default: 60,
     },
-
     current_day: {
       type: Number,
       default: 1,
     },
-
     description: {
       type: String,
       default: "",
     },
-
     roadmap: {
       type: [dailyTaskSchema],
       default: [],
