@@ -116,3 +116,6 @@ export const deleteAdminTask = (id) => {
     });
 };
 
+export const getAdminStats = () => {
+    return apiRequest("/api/admin/stats");
+};
