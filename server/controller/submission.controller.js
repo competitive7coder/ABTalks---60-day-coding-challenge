@@ -38,6 +38,22 @@ export const submitChallenge = async (req, res) => {
             });
         }
 
+        // STEP 1: Enforce time-based locking (max 1 task per 24 hours with a 2-hour grace window = 22 hours)
+        const currentUser = await userModel.findById(userId);
+        if (currentUser && currentUser.lastSubmissionTime) {
+            const lastSubTime = new Date(currentUser.lastSubmissionTime).getTime();
+            const timeDiffMs = Date.now() - lastSubTime;
+            const hoursSinceLastSub = timeDiffMs / (1000 * 60 * 60);
+            console.log("HOURS SINCE LAST SUB (FROM USER):", hoursSinceLastSub);
+            if (hoursSinceLastSub < 22) {
+                const hoursLeft = Math.ceil(22 - hoursSinceLastSub);
+                return res.status(429).json({
+                    success: false,
+                    message: `Next challenge day unlocks in ${hoursLeft} hour(s). Keep building and check back then!`
+                });
+            }
+        }
+
         // Check if this exact repository commit or linkedin link was already submitted on another day
         const duplicateLink = await submissionModel.findOne({
             userId,
@@ -84,22 +100,23 @@ export const submitChallenge = async (req, res) => {
             deployment_url: deployment_url || "",
         });
 
-        // Update User streak stats
+        // Update User streak stats and lastSubmissionTime
         const user = await userModel.findById(userId);
         if (user) {
+            user.lastSubmissionTime = new Date();
             // Increment current streak if submitting the active day
             if (day === challenge.current_day) {
                 user.current_streak += 1;
                 if (user.current_streak > user.longest_streak) {
                     user.longest_streak = user.current_streak;
                 }
-                await user.save();
+            }
+            await user.save();
 
-                // Increment challenge day
-                if (challenge.current_day < 60) {
-                    challenge.current_day += 1;
-                    await challenge.save();
-                }
+            // Increment challenge day
+            if (day === challenge.current_day && challenge.current_day < 60) {
+                challenge.current_day += 1;
+                await challenge.save();
             }
         }
 

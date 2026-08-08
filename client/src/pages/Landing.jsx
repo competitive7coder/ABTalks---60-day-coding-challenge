@@ -122,18 +122,26 @@ export default function Landing({ setMockUser }) {
         await signUp(username, email, password);
         
         // Save selected track to local storage so it gets created once they sign in
-        let selectedTrack = "Full Stack";
-        if (track === "ai-ml" || track === "dsa") selectedTrack = "Backend";
-        else if (track === "mobile") selectedTrack = "Frontend";
+        let selectedTrack = track;
+        if (track === 'web-dev') selectedTrack = "Full Stack";
+        else if (track === 'ai-ml') selectedTrack = "AI/ML";
+        else if (track === 'mobile') selectedTrack = "Mobile";
+        else if (track === 'dsa') selectedTrack = "DSA";
+        
         localStorage.setItem('chosen_track', selectedTrack);
 
         setSuccessMsg('Registration successful! Please sign in.');
         setIsSignUp(false);
       } else {
         // Just log in
-        await signIn(email, password);
+        const loginRes = await signIn(email, password);
         setShowAuthModal(false);
-        navigate('/dashboard');
+        // Admins go directly to their panel; everyone else goes to dashboard
+        if (loginRes?.data?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (err) {
       setErrorMsg(err.message || 'An error occurred during authentication');

@@ -15,7 +15,8 @@ import {
   CheckCircle2, 
   Sparkles,
   Zap,
-  TrendingUp
+  TrendingUp,
+  Shield
 } from 'lucide-react';
 
 export default function Dashboard() {
@@ -293,7 +294,16 @@ export default function Dashboard() {
                   <Zap className="w-3.5 h-3.5 text-yellow" /> {currentTask.difficulty_level || "Medium"}
                 </span>
                 <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                  💻 React, CSS
+                  💻 {(() => {
+                    const name = challenge?.challenge_name || '';
+                    if (name === 'Frontend') return 'React, CSS';
+                    if (name === 'Backend') return 'Node, DB';
+                    if (name === 'AI/ML') return 'Python, PyTorch';
+                    if (name === 'DSA') return 'C++, Java';
+                    if (name === 'Mobile') return 'React Native';
+                    if (name === 'Full Stack') return 'MERN Stack';
+                    return 'Core Tech';
+                  })()}
                 </span>
                 <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
                   🎯 Deploy
@@ -590,6 +600,22 @@ export default function Dashboard() {
                 </div>
               </div>
 
+              {/* Admin Panel Link */}
+              {user?.role === 'admin' && (
+                <div className="glass-panel rounded-2xl p-5 border border-border-light">
+                  <h3 className="text-xs font-bold text-purple uppercase tracking-wider mb-3.5 border-b border-border pb-2 flex items-center gap-2">
+                    👑 Admin Console
+                  </h3>
+                  <p className="text-[11px] text-fg-dark mb-4">You have administrative privileges to manage challenge roadmap tasks.</p>
+                  <button 
+                    onClick={() => navigate('/admin')} 
+                    className="w-full py-3.5 bg-purple/10 border border-purple/35 text-purple font-bold rounded-xl text-xs hover:bg-purple hover:text-bg transition-all duration-300 cursor-pointer text-center flex items-center justify-center gap-2"
+                  >
+                    Go to Admin Panel
+                  </button>
+                </div>
+              )}
+
               {/* Logout Action */}
               <div className="glass-panel rounded-2xl p-5 border border-border-light">
                 <h3 className="text-xs font-bold text-red uppercase tracking-wider mb-3.5 border-b border-border pb-2 flex items-center gap-2">
@@ -667,6 +693,12 @@ export default function Dashboard() {
           <User className="w-5 h-5 mb-0.5" />
           <span>Profile</span>
         </button>
+        {user?.role === 'admin' && (
+          <button className="nav-item" onClick={() => navigate('/admin')}>
+            <Shield className="w-5 h-5 mb-0.5 text-purple" />
+            <span className="text-purple">Admin</span>
+          </button>
+        )}
       </nav>
     </div>
   );

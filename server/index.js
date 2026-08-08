@@ -11,6 +11,8 @@ import connectDB from './config/connectDb.js'
 import challengeRoute from './routes/challenge.route.js'
 import submissionRoute from './routes/submission.route.js'
 import dashboardRouter from './routes/dashboard.route.js'
+import taskRoute from './routes/task.route.js'
+import adminRoute from './routes/admin.route.js'
 
 import auth from "./middleware/auth.js"
 import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController, getCurrentUserController, getLeaderboardController } from './controller/user.controller.js'
@@ -22,7 +24,7 @@ const app = express()
 // third party middlewires
 app.use(cors({
     credentials: true,
-    origin: process.env.CLIENT_URL
+    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', process.env.CLIENT_URL], // Allow all possible local variations
 }))
 
 app.use(express.json())
@@ -51,6 +53,8 @@ app.get("/leaderboard", auth, getLeaderboardController)
 app.use("/api/challenge", challengeRoute)
 app.use("/api/submission", submissionRoute)
 app.use("/api/dashboard" , dashboardRouter)
+app.use("/api/tasks", taskRoute)
+app.use("/api/admin", adminRoute)
 
 connectDB().then(() => {
     app.listen(5000, () => {

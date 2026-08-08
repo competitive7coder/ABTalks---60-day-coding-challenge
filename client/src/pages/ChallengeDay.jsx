@@ -26,6 +26,7 @@ export default function ChallengeDay() {
   const [toastType, setToastType] = useState('success'); // 'success' | 'warning' | 'error'
 
   const [user, setUser] = useState(null);
+  const [challengeInfo, setChallengeInfo] = useState(null);
   const [task, setTask] = useState(null);
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ export default function ChallengeDay() {
         setUser(userRes.data);
 
         const challengeRes = await getChallengeByDay(currentDayNum);
+        setChallengeInfo(challengeRes.challenge);
         setTask(challengeRes.challenge?.task || {});
 
         const subsRes = await getSubmissions();
@@ -135,7 +137,7 @@ export default function ChallengeDay() {
             </button>
             <div>
               <h1 className="text-sm font-bold">Day {currentDayNum}</h1>
-              <p className="text-[10px] text-fg-dark">Active Track</p>
+              <p className="text-[10px] text-fg-dark">{challengeInfo?.challenge_name || 'Active'} Track</p>
             </div>
           </div>
           <span className="inline-flex items-center gap-1 bg-blue/12 text-blue px-2.5 py-1.5 rounded-lg text-[10px] font-bold">
@@ -163,7 +165,16 @@ export default function ChallengeDay() {
               </span>
               <span className="text-[10px] text-fg-dark flex items-center gap-1">
                 <svg className="w-3 h-3 stroke-fg-dark stroke-2 fill-none" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
-                React, CSS
+                {(() => {
+                  const name = challengeInfo?.challenge_name || '';
+                  if (name === 'Frontend') return 'React, CSS';
+                  if (name === 'Backend') return 'Node, DB';
+                  if (name === 'AI/ML') return 'Python, PyTorch';
+                  if (name === 'DSA') return 'C++, Java';
+                  if (name === 'Mobile') return 'React Native';
+                  if (name === 'Full Stack') return 'MERN Stack';
+                  return 'Core Tech';
+                })()}
               </span>
             </div>
           </div>
@@ -184,7 +195,17 @@ export default function ChallengeDay() {
               {task.requirements ? task.requirements.map((req, index) => (
                 <li key={index} className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 last:border-none hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">{req}</li>
               )) : (
-                <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">Follow spec guides closely.</li>
+                <>
+                  <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
+                    Construct the UI core layout utilizing responsive layouts (e.g. CSS Grid / Flexbox).
+                  </li>
+                  <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
+                    Extract reusable visual components (e.g. Card structures) to maintain code organization.
+                  </li>
+                  <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
+                    Ensure responsive breakpoints are defined for both desktop and mobile viewports.
+                  </li>
+                </>
               )}
             </ul>
 
@@ -206,7 +227,14 @@ export default function ChallengeDay() {
               {task.acceptanceCriteria ? task.acceptanceCriteria.map((act, index) => (
                 <li key={index} className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 last:border-none hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">{act}</li>
               )) : (
-                <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">Working live link verified.</li>
+                <>
+                  <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
+                    Verified working proof-of-work link submitted.
+                  </li>
+                  <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
+                    No visual overlap or styling layout breaks across breakpoints.
+                  </li>
+                </>
               )}
             </ul>
           </div>

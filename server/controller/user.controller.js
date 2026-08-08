@@ -92,6 +92,17 @@ export const userLoginController = async (request, response) => {
             })
         }
 
+        // --- PRODUCTION LOGIC: SUPER ADMIN OVERRIDE ---
+        // Big companies bootstrap their first admins using environment variables.
+        // If the logging-in user is listed in SUPER_ADMIN_EMAILS, enforce admin status.
+        const superAdmins = process.env.SUPER_ADMIN_EMAILS ? process.env.SUPER_ADMIN_EMAILS.split(',') : [];
+        if (superAdmins.includes(user.email) && user.role !== 'admin') {
+            user.role = 'admin';
+            await user.save();
+            console.log(`[SECURITY] Bootstrapped Super Admin privileges for ${user.email}`);
+        }
+        // ----------------------------------------------
+
         const accessToken = await generatedAccessToken(user._id)
         const refreshToken = await generateRefreshToken(user._id)
 
@@ -110,7 +121,8 @@ export const userLoginController = async (request, response) => {
             error: false,
             success: true,
             data: {
-                accessToken
+                accessToken,
+                role: user.role  // 'user' or 'admin' — used by frontend to redirect
             }
         })
 

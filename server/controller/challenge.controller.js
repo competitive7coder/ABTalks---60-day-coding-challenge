@@ -1,4 +1,5 @@
 import challengeModel from "../model/challenge.model.js";
+import taskModel from "../model/task.model.js";
 
 import { backendChallenge, frontendChallenge, fullStackChallenge } from "../util/data.js";
 
@@ -27,10 +28,18 @@ export const createChallenge = async (req, res) => {
         } else if (track === "Full Stack") {
             challengeData = fullStackChallenge;
         } else {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid track",
-            });
+            // Support for dynamic custom tracks (e.g. AI/ML, DSA, Mobile)
+            challengeData = {
+                challenge_name: track,
+                total_day: 60,
+                description: `A customized ${track} 60-day challenge roadmap.`,
+                roadmap: Array.from({ length: 60 }, (_, i) => ({
+                    day: i + 1,
+                    task: "Pending Curriculum",
+                    description: `The admin has not added the task for Day ${i + 1} yet.`,
+                    difficulty_level: "Medium"
+                }))
+            };
         }
 
         const challenge = await challengeModel.create({
@@ -70,7 +79,7 @@ export const getCurrentChallenge = async (req, res) => {
             });
         }
 
-        const currentTask = challenge.roadmap.find(
+        let currentTask = challenge.roadmap.find(
             (item) => item.day === challenge.current_day
         );
 
@@ -79,6 +88,23 @@ export const getCurrentChallenge = async (req, res) => {
                 success: false,
                 message: "Current day task not found",
             });
+        }
+
+        // Live override: If an admin updated the task, fetch the latest version
+        let liveTask = await taskModel.findOne({ day: challenge.current_day, track: challenge.challenge_name });
+        if (!liveTask) liveTask = await taskModel.findOne({ day: challenge.current_day, track: { $exists: false } }); // Fallback to general task
+        if (!liveTask) liveTask = await taskModel.findOne({ day: challenge.current_day }); // Catch-all fallback
+
+        if (liveTask) {
+            currentTask = {
+                day: currentTask.day,
+                task: liveTask.task,
+                description: liveTask.description,
+                difficulty_level: liveTask.difficulty_level,
+                requirements: liveTask.requirements,
+                acceptanceCriteria: liveTask.acceptanceCriteria,
+                resources: liveTask.resources
+            };
         }
 
         return res.status(200).json({
@@ -121,7 +147,7 @@ export const getChallengeByDay = async (req, res) => {
             });
         }
 
-        const task = challenge.roadmap.find(
+        let task = challenge.roadmap.find(
             (item) => item.day === day
         );
 
@@ -130,6 +156,23 @@ export const getChallengeByDay = async (req, res) => {
                 success: false,
                 message: "Task not found",
             });
+        }
+
+        // Live override: If an admin updated the task, fetch the latest version
+        let liveTask = await taskModel.findOne({ day: day, track: challenge.challenge_name });
+        if (!liveTask) liveTask = await taskModel.findOne({ day: day, track: { $exists: false } });
+        if (!liveTask) liveTask = await taskModel.findOne({ day: day });
+
+        if (liveTask) {
+            task = {
+                day: task.day,
+                task: liveTask.task,
+                description: liveTask.description,
+                difficulty_level: liveTask.difficulty_level,
+                requirements: liveTask.requirements,
+                acceptanceCriteria: liveTask.acceptanceCriteria,
+                resources: liveTask.resources
+            };
         }
 
         return res.status(200).json({

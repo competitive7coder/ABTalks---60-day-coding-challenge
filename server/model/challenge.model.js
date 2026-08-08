@@ -1,5 +1,15 @@
 import mongoose from "mongoose";
 
+const resourceSchema = new mongoose.Schema(
+  {
+    title: String,
+    url: String,
+    type: String,
+    duration: String,
+  },
+  { _id: false }
+);
+
 const dailyTaskSchema = new mongoose.Schema(
   {
     day: {
@@ -18,7 +28,19 @@ const dailyTaskSchema = new mongoose.Schema(
       type: String,
       enum: ["Easy", "Medium", "Hard"],
       default: "Medium",
-    }
+    },
+    requirements: {
+      type: [String],
+      default: [],
+    },
+    acceptanceCriteria: {
+      type: [String],
+      default: [],
+    },
+    resources: {
+      type: [resourceSchema],
+      default: [],
+    },
   },
   {
     _id: false,
@@ -34,7 +56,6 @@ const challengeSchema = new mongoose.Schema(
     },
     challenge_name: {
       type: String,
-      enum: ["Frontend", "Backend", "Full Stack"],
       required: true,
     },
     total_day: {

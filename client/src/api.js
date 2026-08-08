@@ -89,3 +89,30 @@ export const getLeaderboard = () => {
         method: "GET",
     });
 };
+
+export const getAdminTasks = () => {
+    return apiRequest("/api/tasks", {
+        method: "GET",
+    });
+};
+
+export const createAdminTask = (payload) => {
+    return apiRequest("/api/tasks", {
+        method: "POST",
+        body: JSON.stringify(payload),
+    });
+};
+
+export const updateAdminTask = (id, payload) => {
+    return apiRequest(`/api/tasks/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+    });
+};
+
+export const deleteAdminTask = (id) => {
+    return apiRequest(`/api/tasks/${id}`, {
+        method: "DELETE",
+    });
+};
+
