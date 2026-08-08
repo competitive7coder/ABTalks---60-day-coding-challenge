@@ -29,6 +29,10 @@ const taskSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    track: {
+      type: String,
+      required: true,
+    },
     task: {
       type: String,
       required: true,

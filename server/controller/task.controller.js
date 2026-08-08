@@ -17,17 +17,18 @@ export const getTasks = async (req, res) => {
 
 export const createTask = async (req, res) => {
   try {
-    const { day, task, description, difficulty_level, requirements, acceptanceCriteria, resources } = req.body;
+    const { day, track, task, description, difficulty_level, requirements, acceptanceCriteria, resources } = req.body;
 
-    if (!day || !task) {
+    if (!day || !track || !task) {
       return res.status(400).json({
         success: false,
-        message: "Day and task/title are required fields",
+        message: "Day, track, and task title are required fields",
       });
     }
 
     const newTask = new taskModel({
       day,
+      track,
       task,
       description,
       difficulty_level,
@@ -54,12 +55,13 @@ export const createTask = async (req, res) => {
 export const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { day, task, description, difficulty_level, requirements, acceptanceCriteria, resources } = req.body;
+    const { day, track, task, description, difficulty_level, requirements, acceptanceCriteria, resources } = req.body;
 
     const updatedTask = await taskModel.findByIdAndUpdate(
       id,
       {
         day,
+        track,
         task,
         description,
         difficulty_level,
