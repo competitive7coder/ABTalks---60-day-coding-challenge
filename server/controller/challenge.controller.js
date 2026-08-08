@@ -56,7 +56,12 @@ export const getCurrentChallenge = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const challenge = await challengeModel.findOne({ userId })
+        const challenge = await challengeModel.findOne(
+            {
+                userId: userId,
+                completed: false
+            }
+        )
 
         if (!challenge) {
             return res.status(404).json({
@@ -134,6 +139,7 @@ export const getChallengeByDay = async (req, res) => {
                 challenge_name: challenge.challenge_name,
                 total_day: challenge.total_day,
                 current_day: challenge.current_day,
+                completed: challenge.completed,
                 task,
             },
         });

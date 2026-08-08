@@ -49,6 +49,10 @@ const challengeSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    completed: {
+      type: Boolean,
+      default: false
+    },
     roadmap: {
       type: [dailyTaskSchema],
       default: [],

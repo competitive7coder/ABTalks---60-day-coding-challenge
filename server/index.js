@@ -9,6 +9,7 @@ dotenv.config()
 import connectDB from './config/connectDb.js'
 
 import challengeRoute from './routes/challenge.route.js'
+import submissionRoute from './routes/submission.route.js'
 
 import auth from "./middleware/auth.js"
 import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController } from './controller/user.controller.js'
@@ -18,7 +19,6 @@ const app = express()
 
 
 // third party middlewires
-
 app.use(cors({
     credentials: true,
     origin: process.env.CLIENT_URL
@@ -33,13 +33,11 @@ app.use(helmet({
 
 
 // Gateways
-
 app.get("/", (req, res) => {
     return res.json({
         message: "Hello..."
     })
 })
-
 
 app.post("/sign-up", userRegisterController)
 app.post("/sign-in", userLoginController)
@@ -48,7 +46,7 @@ app.get("/refreshToken", userRefressingTokenController)
 
 // Route level middlewire
 app.use("/api/challenge", challengeRoute)
-
+app.use("/api/submission", submissionRoute)
 
 connectDB().then(() => {
     app.listen(5000, () => {
