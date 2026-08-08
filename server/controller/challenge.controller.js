@@ -19,6 +19,14 @@ export const createChallenge = async (req, res) => {
             });
         }
 
+        // Do not create a student challenge curriculum for Administrator accounts
+        if (track === "Administrator") {
+            return res.status(201).json({
+                success: true,
+                message: "Administrator account setup complete. No student challenge assigned.",
+            });
+        }
+
         let challengeData;
 
         if (track === "Backend") {
@@ -65,7 +73,7 @@ export const getCurrentChallenge = async (req, res) => {
     try {
         const userId = req.userId;
 
-        const challenge = await challengeModel.findOne(
+        let challenge = await challengeModel.findOne(
             {
                 userId: userId,
                 completed: { $ne: true }
@@ -79,6 +87,20 @@ export const getCurrentChallenge = async (req, res) => {
             });
         }
 
+        // Automatic migration for legacy track names
+        const legacyMap = {
+            "web-dev": "Full Stack",
+            "web dev": "Full Stack",
+            "AI / ML": "AI/ML",
+            "Frontend Track": "Frontend",
+            "Mobile Development": "Mobile",
+            "DSA & Algorithms": "DSA"
+        };
+        if (legacyMap[challenge.challenge_name]) {
+            await challengeModel.updateOne({ _id: challenge._id }, { $set: { challenge_name: legacyMap[challenge.challenge_name] } });
+            challenge.challenge_name = legacyMap[challenge.challenge_name];
+        }
+
         let currentTask = challenge.roadmap.find(
             (item) => item.day === challenge.current_day
         );
@@ -90,14 +112,12 @@ export const getCurrentChallenge = async (req, res) => {
             });
         }
 
-        // Live override: If an admin updated the task, fetch the latest version
+        // Live override: If an admin updated the task, fetch the latest version STRICTLY for this track
         let liveTask = await taskModel.findOne({ day: challenge.current_day, track: challenge.challenge_name });
-        if (!liveTask) liveTask = await taskModel.findOne({ day: challenge.current_day, track: { $exists: false } }); // Fallback to general task
-        if (!liveTask) liveTask = await taskModel.findOne({ day: challenge.current_day }); // Catch-all fallback
 
         if (liveTask) {
             currentTask = {
-                day: currentTask.day,
+                day: liveTask.day,
                 task: liveTask.task,
                 description: liveTask.description,
                 difficulty_level: liveTask.difficulty_level,
@@ -110,11 +130,10 @@ export const getCurrentChallenge = async (req, res) => {
         return res.status(200).json({
             success: true,
             challenge: {
-                id: challenge._id,
                 challenge_name: challenge.challenge_name,
                 total_day: challenge.total_day,
                 current_day: challenge.current_day,
-                task: currentTask,
+                task: currentTask, // Only Admin tasks or placeholder
             },
         });
 
@@ -138,13 +157,27 @@ export const getChallengeByDay = async (req, res) => {
             });
         }
 
-        const challenge = await challengeModel.findOne({ userId });
+        let challenge = await challengeModel.findOne({ userId });
 
         if (!challenge) {
             return res.status(404).json({
                 success: false,
                 message: "Challenge not found",
             });
+        }
+
+        // Automatic migration for legacy track names
+        const legacyMap = {
+            "web-dev": "Full Stack",
+            "web dev": "Full Stack",
+            "AI / ML": "AI/ML",
+            "Frontend Track": "Frontend",
+            "Mobile Development": "Mobile",
+            "DSA & Algorithms": "DSA"
+        };
+        if (legacyMap[challenge.challenge_name]) {
+            challenge.challenge_name = legacyMap[challenge.challenge_name];
+            await challenge.save();
         }
 
         let task = challenge.roadmap.find(
@@ -154,18 +187,17 @@ export const getChallengeByDay = async (req, res) => {
         if (!task) {
             return res.status(404).json({
                 success: false,
-                message: "Task not found",
+                message: "Task not found in roadmap",
             });
         }
 
-        // Live override: If an admin updated the task, fetch the latest version
+        // Live override: Fetch the latest version STRICTLY for this track from the admin panel
         let liveTask = await taskModel.findOne({ day: day, track: challenge.challenge_name });
-        if (!liveTask) liveTask = await taskModel.findOne({ day: day, track: { $exists: false } });
-        if (!liveTask) liveTask = await taskModel.findOne({ day: day });
 
+        let finalTask = task; // fallback to roadmap
         if (liveTask) {
-            task = {
-                day: task.day,
+            finalTask = {
+                day: day,
                 task: liveTask.task,
                 description: liveTask.description,
                 difficulty_level: liveTask.difficulty_level,
@@ -183,7 +215,7 @@ export const getChallengeByDay = async (req, res) => {
                 total_day: challenge.total_day,
                 current_day: challenge.current_day,
                 completed: challenge.completed,
-                task,
+                task: finalTask,
             },
         });
     } catch (error) {
