@@ -82,10 +82,9 @@ export default function Landing({ setMockUser }) {
       newHistory = [
         ...newHistory,
         { text: '📁 tracks/', type: 'info' },
-        { text: '  ├── 💻 Web-Dev (Full-Stack React & Node) [60 days]', type: 'response' },
-        { text: '  ├── 🤖 AI-ML (Neural Nets & PyTorch) [60 days]', type: 'response' },
-        { text: '  ├── 📱 Mobile (React Native Apps) [60 days]', type: 'response' },
-        { text: '  └── 🎯 DSA (Problem Solving & Interview Prep) [60 days]', type: 'response' }
+        { text: '  ├── 💻 Full Stack (React, Node, DB) [60 days]', type: 'response' },
+        { text: '  ├── 🎨 Frontend (UI/UX & React) [60 days]', type: 'response' },
+        { text: '  └── ⚙️ Backend (APIs & Database) [60 days]', type: 'response' }
       ];
     } else if (cmd === 'about') {
       newHistory = [
@@ -122,13 +121,7 @@ export default function Landing({ setMockUser }) {
         await signUp(username, email, password);
         
         // Save selected track to local storage so it gets created once they sign in
-        let selectedTrack = track;
-        if (track === 'web-dev') selectedTrack = "Full Stack";
-        else if (track === 'ai-ml') selectedTrack = "AI/ML";
-        else if (track === 'mobile') selectedTrack = "Mobile";
-        else if (track === 'dsa') selectedTrack = "DSA";
-        
-        localStorage.setItem('chosen_track', selectedTrack);
+        sessionStorage.setItem('chosen_track', track);
 
         setSuccessMsg('Registration successful! Please sign in.');
         setIsSignUp(false);
@@ -315,15 +308,15 @@ export default function Landing({ setMockUser }) {
 
         <section className="py-6">
           <h2 className="text-base font-black text-center mb-6 relative after:content-[''] after:block after:w-10 after:h-0.5 after:bg-linear-to-r after:from-blue after:to-purple after:mx-auto after:mt-2 after:rounded uppercase tracking-wide">Choose Your Track</h2>
-          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+          <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3 md:gap-5 max-w-250 mx-auto">
             <div 
               className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-blue hover:shadow-[0_0_20px_var(--blue-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
-              onClick={() => { setTrack('web-dev'); setShowAuthModal(true); setIsSignUp(true); }}
+              onClick={() => { setTrack('Full Stack'); setShowAuthModal(true); setIsSignUp(true); }}
             >
               <div className="absolute top-1.5 right-2 w-1.5 h-1.5 bg-green rounded-full anim-ring-pulse"></div>
-              <div className="text-[10px] text-blue font-bold tracking-wider mb-2 font-mono">$ init --web</div>
-              <h4 className="text-xs font-black text-fg mb-1">Web Dev</h4>
-              <p className="text-fg-dark text-[10px] mb-3">Full-stack React & Node</p>
+              <div className="text-[10px] text-blue font-bold tracking-wider mb-2 font-mono">$ init --fullstack</div>
+              <h4 className="text-xs font-black text-fg mb-1">Full Stack</h4>
+              <p className="text-fg-dark text-[10px] mb-3">MERN Stack Development</p>
               <div className="text-[9px] text-fg-muted font-mono bg-bg-dark/50 p-1.5 rounded-lg border border-border-light">
                 <div>Tasks: 60 tasks</div>
                 <div>Avg Pay: 12 LPA</div>
@@ -332,26 +325,12 @@ export default function Landing({ setMockUser }) {
 
             <div 
               className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-purple hover:shadow-[0_0_20px_var(--purple-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
-              onClick={() => { setTrack('ai-ml'); setShowAuthModal(true); setIsSignUp(true); }}
+              onClick={() => { setTrack('Frontend'); setShowAuthModal(true); setIsSignUp(true); }}
             >
               <div className="absolute top-1.5 right-2 w-1.5 h-1.5 bg-green rounded-full anim-ring-pulse"></div>
-              <div className="text-[10px] text-purple font-bold tracking-wider mb-2 font-mono">$ init --ai</div>
-              <h4 className="text-xs font-black text-fg mb-1">AI / ML</h4>
-              <p className="text-fg-dark text-[10px] mb-3">LLMs, PyTorch & Apps</p>
-              <div className="text-[9px] text-fg-muted font-mono bg-bg-dark/50 p-1.5 rounded-lg border border-border-light">
-                <div>Tasks: 60 tasks</div>
-                <div>Avg Pay: 16 LPA</div>
-              </div>
-            </div>
-
-            <div 
-              className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-cyan hover:shadow-[0_0_20px_var(--cyan-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
-              onClick={() => { setTrack('mobile'); setShowAuthModal(true); setIsSignUp(true); }}
-            >
-              <div className="absolute top-1.5 right-2 w-1.5 h-1.5 bg-green rounded-full anim-ring-pulse"></div>
-              <div className="text-[10px] text-cyan font-bold tracking-wider mb-2 font-mono">$ init --mobile</div>
-              <h4 className="text-xs font-black text-fg mb-1">Mobile Dev</h4>
-              <p className="text-fg-dark text-[10px] mb-3">iOS & Android React Native</p>
+              <div className="text-[10px] text-purple font-bold tracking-wider mb-2 font-mono">$ init --frontend</div>
+              <h4 className="text-xs font-black text-fg mb-1">Frontend</h4>
+              <p className="text-fg-dark text-[10px] mb-3">React, Tailwind, UI/UX</p>
               <div className="text-[9px] text-fg-muted font-mono bg-bg-dark/50 p-1.5 rounded-lg border border-border-light">
                 <div>Tasks: 60 tasks</div>
                 <div>Avg Pay: 10 LPA</div>
@@ -359,16 +338,16 @@ export default function Landing({ setMockUser }) {
             </div>
 
             <div 
-              className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-orange hover:shadow-[0_0_20px_var(--orange-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
-              onClick={() => { setTrack('dsa'); setShowAuthModal(true); setIsSignUp(true); }}
+              className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-cyan hover:shadow-[0_0_20px_var(--cyan-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
+              onClick={() => { setTrack('Backend'); setShowAuthModal(true); setIsSignUp(true); }}
             >
               <div className="absolute top-1.5 right-2 w-1.5 h-1.5 bg-green rounded-full anim-ring-pulse"></div>
-              <div className="text-[10px] text-orange font-bold tracking-wider mb-2 font-mono">$ init --dsa</div>
-              <h4 className="text-xs font-black text-fg mb-1">DSA / Prep</h4>
-              <p className="text-fg-dark text-[10px] mb-3">LeetCode & Algorithms</p>
+              <div className="text-[10px] text-cyan font-bold tracking-wider mb-2 font-mono">$ init --backend</div>
+              <h4 className="text-xs font-black text-fg mb-1">Backend</h4>
+              <p className="text-fg-dark text-[10px] mb-3">Node.js, Express, DBs</p>
               <div className="text-[9px] text-fg-muted font-mono bg-bg-dark/50 p-1.5 rounded-lg border border-border-light">
                 <div>Tasks: 60 tasks</div>
-                <div>Avg Pay: 15 LPA</div>
+                <div>Avg Pay: 14 LPA</div>
               </div>
             </div>
           </div>
@@ -532,10 +511,10 @@ export default function Landing({ setMockUser }) {
                     className="w-full px-3.5 py-3 bg-bg border border-border rounded-xl text-fg text-xs focus:outline-none focus:border-blue transition-all"
                     style={{ fontFamily: 'inherit' }}
                   >
-                    <option value="web-dev">Web Development</option>
-                    <option value="ai-ml">AI / ML</option>
-                    <option value="mobile">Mobile Development</option>
-                    <option value="dsa">DSA & Algorithms</option>
+                    <option value="Full Stack">Full Stack (Web Dev)</option>
+                    <option value="Frontend">Frontend (UI/UX)</option>
+                    <option value="Backend">Backend (APIs & DB)</option>
+                    <option value="Administrator">Administrator / Teacher</option>
                   </select>
                 </div>
               )}

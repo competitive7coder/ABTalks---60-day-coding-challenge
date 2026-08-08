@@ -69,12 +69,12 @@ export default function Dashboard() {
           const challengeRes = await getCurrentChallenge();
           challengeData = challengeRes.challenge;
         } catch (challengeErr) {
-          const storedTrack = localStorage.getItem('chosen_track');
+          const storedTrack = sessionStorage.getItem('chosen_track');
           if (storedTrack) {
             await createChallenge(storedTrack);
             const secondAttempt = await getCurrentChallenge();
             challengeData = secondAttempt.challenge;
-            localStorage.removeItem('chosen_track');
+            sessionStorage.removeItem('chosen_track');
           } else {
             setNoChallenge(true);
           }
@@ -109,6 +109,7 @@ export default function Dashboard() {
   const initials = user?.name ? user.name.slice(0, 2).toUpperCase() : 'US';
   const displayStreak = user?.current_streak || 0;
   const displayDay = challenge?.current_day || 1;
+  // const displayDay = 5; #DEMO
   const currentTask = challenge?.task || {};
   const isCompleted = submissions.some(s => s.day === displayDay);
 
@@ -137,8 +138,8 @@ export default function Dashboard() {
     name: u.name,
     streak: u.current_streak,
     completed: u.current_streak,
-    track: "Full Stack",
-    badge: u.current_streak >= 30 ? "ðŸ’Ž Veteran" : u.current_streak >= 10 ? "ðŸ”¥ Streaker" : "ðŸŒ± Newbie",
+    track: u.name === user?.name && challenge?.challenge_name ? challenge.challenge_name : "Full Stack",
+    badge: u.current_streak >= 30 ? "💎 Veteran" : u.current_streak >= 10 ? "🔥 Streaker" : "🌱 Newbie",
     initials: u.name.slice(0, 2).toUpperCase(),
     color: u.current_streak >= 30 ? "from-yellow to-orange" : "from-blue to-purple"
   }));
@@ -199,28 +200,49 @@ export default function Dashboard() {
               </span>
               <h2 className="text-base font-extrabold text-fg mb-1">Select Your Cohort Track</h2>
               <p className="text-xs text-fg-dark mb-6">You do not have an active track yet. Choose one to initialize your 60-day roadmap.</p>
-
-              <div className="flex flex-col gap-3.5 text-left mb-6">
-                <div
-                  onClick={() => setSelectedTrack('Full Stack')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Full Stack' ? 'bg-blue/10 border-blue shadow-[0_0_15px_var(--blue-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+              {user?.role === 'admin' && (
+                <div className="mb-6 p-4 rounded-xl border bg-purple/10 border-purple shadow-[0_0_15px_var(--purple-glow)] cursor-pointer" onClick={() => navigate('/admin')}>
+                  <h4 className="text-xs font-black text-purple mb-0.5">👑 Administrator Console</h4>
+                  <p className="text-[10px] text-fg-dark">You are an admin. Click here to bypass the student curriculum and manage the platform.</p>
+                </div>
+              )}
+              
+              <div className="flex flex-col gap-2.5 text-left mb-6 h-64 overflow-y-auto pr-2 scrollbar-thin">
+                <div 
+                  onClick={() => setSelectedTrack('Full Stack')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Full Stack' ? 'bg-blue/10 border-blue shadow-[0_0_15px_var(--blue-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Full Stack (Web Dev)</h4>
-                  <p className="text-[10px] text-fg-dark">Curriculum covering React, Node.js, Express, and Database development.</p>
                 </div>
-                <div
-                  onClick={() => setSelectedTrack('Backend')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Backend' ? 'bg-purple/10 border-purple shadow-[0_0_15px_var(--purple-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+                <div 
+                  onClick={() => setSelectedTrack('Frontend')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Frontend' ? 'bg-cyan/10 border-cyan shadow-[0_0_15px_var(--cyan-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
-                  <h4 className="text-xs font-black text-fg mb-0.5">Backend (AI/ML & DSA)</h4>
-                  <p className="text-[10px] text-fg-dark">Core algorithms, systems architecture, and machine learning models.</p>
+                  <h4 className="text-xs font-black text-fg mb-0.5">Frontend (UI/UX)</h4>
                 </div>
-                <div
-                  onClick={() => setSelectedTrack('Frontend')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Frontend' ? 'bg-cyan/10 border-cyan shadow-[0_0_15px_var(--cyan-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+                <div 
+                  onClick={() => setSelectedTrack('Backend')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Backend' ? 'bg-purple/10 border-purple shadow-[0_0_15px_var(--purple-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
-                  <h4 className="text-xs font-black text-fg mb-0.5">Frontend (Mobile & UI)</h4>
-                  <p className="text-[10px] text-fg-dark">Cross-platform app construction, responsive design and animations.</p>
+                  <h4 className="text-xs font-black text-fg mb-0.5">Backend (APIs & DB)</h4>
+                </div>
+                <div 
+                  onClick={() => setSelectedTrack('AI/ML')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'AI/ML' ? 'bg-orange/10 border-orange shadow-[0_0_15px_rgba(255,165,0,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+                >
+                  <h4 className="text-xs font-black text-fg mb-0.5">AI / Machine Learning</h4>
+                </div>
+                <div 
+                  onClick={() => setSelectedTrack('Mobile')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Mobile' ? 'bg-green/10 border-green shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+                >
+                  <h4 className="text-xs font-black text-fg mb-0.5">Mobile App Development</h4>
+                </div>
+                <div 
+                  onClick={() => setSelectedTrack('DSA')} 
+                  className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'DSA' ? 'bg-pink/10 border-pink shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
+                >
+                  <h4 className="text-xs font-black text-fg mb-0.5">DSA & Algorithms</h4>
                 </div>
               </div>
 
@@ -246,35 +268,47 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              {/* Streak Card */}
-              <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
-                <div className="flex justify-between items-start mb-3 relative z-10">
-                  <div>
-                    <h2 className="text-[9px] text-blue font-bold tracking-wider uppercase mb-1 flex items-center gap-1">
-                      <TrendingUp className="w-3.5 h-3.5" /> Current Streak
-                    </h2>
-                    <div className="text-4xl font-black bg-linear-to-r from-blue to-cyan bg-clip-text text-transparent">{displayStreak}</div>
+            {/* Streak Card */}
+            <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
+              <div className="flex justify-between items-start mb-3 relative z-10">
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <div className="text-xs font-bold tracking-widest text-transparent bg-clip-text bg-linear-to-r from-orange to-red uppercase drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
+                      {displayStreak === 0 ? "START YOUR ENGINE" : "STREAK_ACTIVE"}
+                    </div>
                     <div className="text-fg-dark text-[10px] mt-1">
-                      days strong · Best: {user?.longest_streak || 0}
+                      {displayStreak === 0 ? "First submission ignites the flame" : `days strong · Best: ${user?.longest_streak || 0}`}
                     </div>
                   </div>
-                  <div className="text-3xl filter drop-shadow-orange-glow anim-flame">
-                    <Flame className="w-9 h-9 text-orange fill-orange" />
+                  <div className={`text-3xl filter ${displayStreak > 0 ? 'drop-shadow-orange-glow anim-flame' : 'grayscale opacity-50'}`}>
+                    {displayStreak > 0 ? (
+                      <Flame className="w-9 h-9 text-orange fill-orange" />
+                    ) : (
+                      <Flame className="w-9 h-9 text-fg-dark fill-fg-dark" />
+                    )}
                   </div>
-                </div>
-                <div className="calendar relative z-10">
-                  {renderedDays.map((day) => (
-                    <div
-                      key={day.day}
-                      className={`calendar-day ${day.completed ? 'day-done' : ''} ${day.missed ? 'day-missed' : ''} ${day.current ? 'day-today' : ''} ${day.upcoming ? 'day-upcoming' : 'day-empty'}`}
-                      onClick={() => navigate(`/day/${day.day}`)}
-                      style={{ fontSize: day.completed ? '14px' : '9px' }}
-                    >
-                      {day.completed ? '🔥' : day.day}
-                    </div>
-                  ))}
                 </div>
               </div>
+              
+              {/* Horizontal swipable calendar for better mobile UX */}
+              <div className="calendar relative z-10 flex overflow-x-auto gap-2 pb-2 scrollbar-thin snap-x">
+                {renderedDays.map((day) => (
+                  <div
+                    key={day.day}
+                    className={`calendar-day shrink-0 snap-center w-12 h-12 flex items-center justify-center rounded-xl border transition-all duration-300 cursor-pointer ${
+                      day.completed ? 'bg-orange/20 border-orange shadow-[0_0_12px_rgba(249,115,22,0.3)] text-orange' : 
+                      day.missed ? 'bg-cyan/10 border-cyan/40 text-cyan/70 shadow-[inset_0_0_8px_rgba(6,182,212,0.2)]' : // Frozen streak mechanic
+                      day.current ? 'bg-blue/15 border-blue shadow-[0_0_12px_rgba(59,130,246,0.3)] text-blue scale-110 relative z-10' : 
+                      'bg-surface-glass border-border-light text-fg-muted hover:border-fg-dark'
+                    }`}
+                    onClick={() => navigate(`/day/${day.day}`)}
+                    style={{ fontSize: day.completed || day.missed ? '16px' : '11px', fontWeight: 'bold' }}
+                  >
+                    {day.completed ? '🔥' : day.missed ? '🧊' : day.day}
+                  </div>
+                ))}
+              </div>
+            </div>
 
               {/* Today's Task */}
               <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
@@ -433,7 +467,7 @@ export default function Dashboard() {
           </div>
 
           {/* -- Two columns filling remaining height -- */}
-          <div className="grid grid-cols-[1fr_1fr] gap-3 px-5 pb-2 flex-1 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-3 px-5 pb-2 flex-1 overflow-y-auto md:min-h-0">
 
             {/* LEFT: Creative Podium */}
             {combinedLeaderboard.length >= 3 && (
@@ -654,15 +688,15 @@ export default function Dashboard() {
                 </h3>
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
-                    <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
+                    <a href={user?.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface/50 hover:bg-surface border border-white/5 transition-colors text-sm font-medium">
                       <FaGithub className="w-4 h-4 text-fg" /> GitHub Profile
-                    </span>
+                    </a>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
-                    <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
+                    <a href={user?.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface/50 hover:bg-surface border border-white/5 transition-colors text-sm font-medium">
                       <FaLinkedin className="w-4 h-4 text-blue" /> LinkedIn Profile
-                    </span>
+                    </a>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>
                 </div>
