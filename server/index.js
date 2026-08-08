@@ -7,14 +7,19 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 import connectDB from './config/connectDb.js'
+import auth from "./middleware/auth.js"
+import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController } from './controller/user.controller.js'
 
 
 const app = express()
 
-// app.use(cors({
-//     credentials: true,
-//     origin: process.env.FRONTENT_URL
-// }))
+
+// middlewires
+
+app.use(cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL
+}))
 
 app.use(express.json())
 app.use(cookieParser())
@@ -24,11 +29,20 @@ app.use(helmet({
 }))
 
 
+// Gateways
+
 app.get("/", (req, res) => {
     return res.json({
         message: "Hello..."
     })
 })
+
+
+app.post("/sign-up", userRegisterController)
+app.post("/sign-in", userLoginController)
+app.post("/logout", userLogOutController)
+app.get("/refreshToken", userRefressingTokenController)
+
 
 
 connectDB().then(() => {

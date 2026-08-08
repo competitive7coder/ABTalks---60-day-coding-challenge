@@ -59,6 +59,6 @@ submissionSchema.index(
   }
 );
 
-const Submission = mongoose.model("Submission", submissionSchema);
+const submissionModel = mongoose.model("Submission", submissionSchema);
 
-export default Submission;
+export default submissionModel;
