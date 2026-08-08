@@ -10,6 +10,7 @@ import connectDB from './config/connectDb.js'
 
 import challengeRoute from './routes/challenge.route.js'
 import submissionRoute from './routes/submission.route.js'
+import dashboardRouter from './routes/dashboard.route.js'
 
 import auth from "./middleware/auth.js"
 import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController } from './controller/user.controller.js'
@@ -47,6 +48,7 @@ app.get("/refreshToken", userRefressingTokenController)
 // Route level middlewire
 app.use("/api/challenge", challengeRoute)
 app.use("/api/submission", submissionRoute)
+app.use("/api/dashboard" , dashboardRouter)
 
 connectDB().then(() => {
     app.listen(5000, () => {
