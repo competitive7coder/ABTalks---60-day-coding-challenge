@@ -211,3 +211,47 @@ export const userRefressingTokenController = async (request, response) => {
         })
     }
 }
+
+export const getCurrentUserController = async (request, response) => {
+    try {
+        const userId = request.userId
+        const user = await userModel.findById(userId).select('-password -refresh_token')
+        if (!user) {
+            return response.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            })
+        }
+        return response.json({
+            message: "User fetched successfully",
+            error: false,
+            success: true,
+            data: user
+        })
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        })
+    }
+}
+
+export const getLeaderboardController = async (request, response) => {
+    try {
+        const users = await userModel.find().select('name current_streak longest_streak').sort({ current_streak: -1 }).limit(10)
+        return response.json({
+            message: "Leaderboard fetched successfully",
+            error: false,
+            success: true,
+            data: users
+        })
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        })
+    }
+}

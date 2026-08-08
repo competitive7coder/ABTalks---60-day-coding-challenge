@@ -59,7 +59,7 @@ export const getCurrentChallenge = async (req, res) => {
         const challenge = await challengeModel.findOne(
             {
                 userId: userId,
-                completed: false
+                completed: { $ne: true }
             }
         )
 

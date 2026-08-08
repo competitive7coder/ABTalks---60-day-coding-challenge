@@ -13,7 +13,7 @@ import submissionRoute from './routes/submission.route.js'
 import dashboardRouter from './routes/dashboard.route.js'
 
 import auth from "./middleware/auth.js"
-import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController } from './controller/user.controller.js'
+import { userLoginController, userLogOutController, userRefressingTokenController, userRegisterController, getCurrentUserController, getLeaderboardController } from './controller/user.controller.js'
 
 
 const app = express()
@@ -44,6 +44,8 @@ app.post("/sign-up", userRegisterController)
 app.post("/sign-in", userLoginController)
 app.post("/logout", userLogOutController)
 app.get("/refreshToken", userRefressingTokenController)
+app.get("/me", auth, getCurrentUserController)
+app.get("/leaderboard", auth, getLeaderboardController)
 
 // Route level middlewire
 app.use("/api/challenge", challengeRoute)
