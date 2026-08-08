@@ -12,11 +12,21 @@ import {
   Zap
 } from 'lucide-react';
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import Confetti from 'react-confetti';
 
 export default function ChallengeDay() {
   const navigate = useNavigate();
   const { dayId } = useParams();
   const currentDayNum = Number(dayId) || 12;
+
+  const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [githubUrl, setGithubUrl] = useState('');
   const [linkedinUrl, setLinkedinUrl] = useState('');
@@ -77,6 +87,7 @@ export default function ChallengeDay() {
       setToastType('success');
       setToastMessage(`Day ${currentDayNum} completed! Streak saved.`);
       setShowToast(true);
+      setShowConfetti(true);
 
       // Refresh submissions
       const subsRes = await getSubmissions();
@@ -88,7 +99,8 @@ export default function ChallengeDay() {
 
       setTimeout(() => {
         setShowToast(false);
-      }, 4000);
+        setShowConfetti(false);
+      }, 5000);
     } catch (err) {
       setToastType('error');
       setToastMessage(err.message || 'Error submitting challenge day task.');
@@ -122,6 +134,16 @@ export default function ChallengeDay() {
 
   return (
     <div className="min-h-screen bg-bg text-fg font-sans relative overflow-x-hidden selection:bg-blue/30 selection:text-blue pb-26 md:pb-28">
+      {showConfetti && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          recycle={true}
+          numberOfPieces={300}
+          gravity={0.15}
+          colors={['#3b82f6', '#8b5cf6', '#06b6d4', '#10b981', '#f97316']}
+        />
+      )}
       <div className="ambient-glow glow-1 -right-20 top-15 bg-blue anim-float"></div>
       <div className="ambient-glow glow-2 -left-25 top-125 bg-purple anim-float" style={{ animationDelay: '2s' }}></div>
       <div className="ambient-glow glow-3 -right-15 bottom-50 bg-cyan anim-float" style={{ animationDelay: '4s' }}></div>
@@ -184,25 +206,55 @@ export default function ChallengeDay() {
               <svg className="w-3.5 h-3.5 stroke-blue stroke-2 fill-none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
               The Mission
             </h3>
-            <p className="text-[11px] leading-relaxed text-fg-dark mb-2.5">{task.description || "Submit daily proof-of-work to keep your progress active."}</p>
+            <p className="text-[11px] leading-relaxed text-fg-dark mb-4">{task.description || "Submit daily proof-of-work to keep your progress active."}</p>
+
+            <h3 className="text-[10px] text-blue font-bold tracking-wider uppercase mb-1.5 flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 stroke-blue stroke-2 fill-none" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></svg>
+              Step-by-Step Execution
+            </h3>
+            <div className="mb-4 space-y-2">
+              {task.instructions?.length > 0 ? (
+                task.instructions.map((inst, index) => (
+                  <div key={index} className="flex gap-2.5 items-start">
+                    <div className="w-5 h-5 rounded-md bg-bg-dark border border-border flex items-center justify-center text-[9px] font-bold text-fg-muted shrink-0 mt-0.5">{index + 1}</div>
+                    <p className="text-[10.5px] text-fg-dark leading-relaxed">{inst}</p>
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="flex gap-2.5 items-start">
+                    <div className="w-5 h-5 rounded-md bg-bg-dark border border-border flex items-center justify-center text-[9px] font-bold text-fg-muted shrink-0 mt-0.5">1</div>
+                    <p className="text-[10.5px] text-fg-dark leading-relaxed">Initialize a new Git repository and set up your project architecture specifically for the <strong className="text-fg-muted">{task.task}</strong> assignment.</p>
+                  </div>
+                  <div className="flex gap-2.5 items-start">
+                    <div className="w-5 h-5 rounded-md bg-bg-dark border border-border flex items-center justify-center text-[9px] font-bold text-fg-muted shrink-0 mt-0.5">2</div>
+                    <p className="text-[10.5px] text-fg-dark leading-relaxed">Implement the core business logic required to successfully build <strong className="text-fg-muted">{task.task}</strong>, ensuring you handle edge cases gracefully.</p>
+                  </div>
+                  <div className="flex gap-2.5 items-start">
+                    <div className="w-5 h-5 rounded-md bg-bg-dark border border-border flex items-center justify-center text-[9px] font-bold text-fg-muted shrink-0 mt-0.5">3</div>
+                    <p className="text-[10.5px] text-fg-dark leading-relaxed">Commit your changes with a descriptive message, push to GitHub, and document your learnings on LinkedIn to verify completion.</p>
+                  </div>
+                </>
+              )}
+            </div>
 
             <h3 className="text-[10px] text-blue font-bold tracking-wider uppercase mb-1.5 flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5 stroke-blue stroke-2 fill-none" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /></svg>
               Requirements
             </h3>
             <ul className="mb-2 list-none">
-              {task.requirements ? task.requirements.map((req, index) => (
+              {task.requirements?.length > 0 ? task.requirements.map((req, index) => (
                 <li key={index} className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 last:border-none hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">{req}</li>
               )) : (
                 <>
                   <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
-                    Construct the UI core layout utilizing responsive layouts (e.g. CSS Grid / Flexbox).
+                    Construct the core logic utilizing best practices and robust architecture specific to <strong className="text-fg-muted">{task.task}</strong>.
                   </li>
                   <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
-                    Extract reusable visual components (e.g. Card structures) to maintain code organization.
+                    Extract reusable logic or components to maintain code organization during the implementation of <strong className="text-fg-muted">{task.task}</strong>.
                   </li>
                   <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
-                    Ensure responsive breakpoints are defined for both desktop and mobile viewports.
+                    Ensure robust error handling is implemented across all features.
                   </li>
                 </>
               )}
@@ -223,15 +275,15 @@ export default function ChallengeDay() {
               Acceptance Criteria
             </h3>
             <ul className="list-none">
-              {task.acceptanceCriteria ? task.acceptanceCriteria.map((act, index) => (
+              {task.acceptanceCriteria?.length > 0 ? task.acceptanceCriteria.map((act, index) => (
                 <li key={index} className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 last:border-none hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">{act}</li>
               )) : (
                 <>
                   <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark border-b border-fg/4 hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
-                    Verified working proof-of-work link submitted.
+                    Verified working proof-of-work link submitted for <strong className="text-fg-muted">{task.task}</strong>.
                   </li>
                   <li className="pl-5.5 py-1 relative text-[11px] text-fg-dark hover:text-fg-muted hover:pl-6.5 transition-all duration-300 before:content-[''] before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-3 before:h-3 before:bg-green before:rounded-sm after:content-[''] after:absolute after:left-1 after:top-1/2 after:-translate-y-1/2 after:rotate-45 after:w-0.5 after:h-1 after:border-b-2 after:border-r-2 after:border-bg">
-                    No visual overlap or styling layout breaks across breakpoints.
+                    Code compiles successfully and all functionality for <strong className="text-fg-muted">{task.task}</strong> works as described without errors.
                   </li>
                 </>
               )}
