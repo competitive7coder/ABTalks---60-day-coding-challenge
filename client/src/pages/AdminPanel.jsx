@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, getAdminTasks, createAdminTask, updateAdminTask, deleteAdminTask } from '../api';
+import { getCurrentUser, getAdminTasks, createAdminTask, updateAdminTask, deleteAdminTask, getAdminStats } from '../api';
 import { 
   Home, 
   ArrowLeft,
@@ -20,6 +20,9 @@ export default function AdminPanel() {
   const [user, setUser] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [activeTab, setActiveTab] = useState('tasks'); // 'tasks' or 'metrics'
+  const [stats, setStats] = useState(null);
 
   // Form states
   const [editingId, setEditingId] = useState(null);
@@ -50,6 +53,9 @@ export default function AdminPanel() {
 
         const tasksRes = await getAdminTasks();
         setTasks(tasksRes.tasks || []);
+
+        const statsRes = await getAdminStats();
+        setStats(statsRes);
       } catch (err) {
         console.error(err);
         navigate('/');
@@ -189,6 +195,23 @@ export default function AdminPanel() {
         </div>
       </header>
 
+      {/* Tabs */}
+      <div className="max-w-300 mx-auto px-5 mt-6 flex gap-4">
+        <button 
+          onClick={() => setActiveTab('tasks')}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'tasks' ? 'bg-blue/20 text-blue border border-blue/35' : 'bg-surface/30 text-fg-dark hover:bg-surface/50 border border-transparent'}`}
+        >
+          📚 Manage Tasks
+        </button>
+        <button 
+          onClick={() => setActiveTab('metrics')}
+          className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'metrics' ? 'bg-purple/20 text-purple border border-purple/35' : 'bg-surface/30 text-fg-dark hover:bg-surface/50 border border-transparent'}`}
+        >
+          📈 Cohort Metrics & Leaderboard
+        </button>
+      </div>
+
+      {activeTab === 'tasks' && (
       <main className="max-w-300 mx-auto px-5 py-6 grid grid-cols-1 lg:grid-cols-[1.2fr_1.8fr] gap-6">
         
         {/* LEFT COLUMN: Create/Edit Form */}
@@ -464,6 +487,60 @@ export default function AdminPanel() {
         </section>
 
       </main>
+      )}
+
+      {activeTab === 'metrics' && (
+        <main className="max-w-300 mx-auto px-5 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div className="glass-panel rounded-2xl p-6 border border-border-light text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-blue/10 rounded-full blur-2xl"></div>
+              <h3 className="text-xs font-bold text-fg-muted uppercase tracking-wider mb-2">Total Students</h3>
+              <p className="text-3xl font-black text-blue drop-shadow-[0_0_15px_var(--blue-glow)]">{stats?.stats?.totalUsers || 0}</p>
+            </div>
+            <div className="glass-panel rounded-2xl p-6 border border-border-light text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-purple/10 rounded-full blur-2xl"></div>
+              <h3 className="text-xs font-bold text-fg-muted uppercase tracking-wider mb-2">Total Submissions</h3>
+              <p className="text-3xl font-black text-purple drop-shadow-[0_0_15px_var(--purple-glow)]">{stats?.stats?.totalSubmissions || 0}</p>
+            </div>
+            <div className="glass-panel rounded-2xl p-6 border border-border-light text-center relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-cyan/10 rounded-full blur-2xl"></div>
+              <h3 className="text-xs font-bold text-fg-muted uppercase tracking-wider mb-2">Tasks Created</h3>
+              <p className="text-3xl font-black text-cyan drop-shadow-[0_0_15px_var(--cyan-glow)]">{stats?.stats?.totalChallenges || 0}</p>
+            </div>
+          </div>
+
+          <div className="glass-panel rounded-2xl p-6 border border-border-light">
+            <h3 className="text-sm font-bold text-fg uppercase tracking-wider mb-5 flex items-center gap-2">
+              🏆 Global Leaderboard Top 100
+            </h3>
+            
+            <div className="flex flex-col gap-3">
+              {stats?.leaderboard?.length === 0 ? (
+                <div className="text-center text-xs text-fg-dark py-10">No students found.</div>
+              ) : (
+                stats?.leaderboard?.map((u, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3.5 bg-surface/30 border border-border/80 rounded-xl hover:bg-surface/50 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue to-purple flex items-center justify-center text-[10px] font-bold text-bg shadow-sm">
+                        #{idx + 1}
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-fg">{u.name}</h4>
+                        <p className="text-[10px] text-fg-dark">{u.email} {u.role === 'admin' ? '(Admin)' : ''}</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs font-black text-orange drop-shadow-[0_0_8px_rgba(255,165,0,0.5)]">
+                        {u.current_streak} <span className="text-[10px] text-fg-muted font-normal">days</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </main>
+      )}
 
       {/* Floating success toast */}
       <div className={`toast ${message ? 'show' : ''} ${msgType}`} id="toast">
