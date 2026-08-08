@@ -8,8 +8,8 @@ import {
   Flame, 
   ClipboardCheck, 
   Award, 
-  Github, 
-  Linkedin, 
+  Code, 
+  Briefcase, 
   LogOut, 
   Users, 
   CheckCircle2, 
@@ -656,15 +656,15 @@ export default function Dashboard() {
                 </h3>
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
-                    <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
-                      <Github className="w-4 h-4 text-fg" /> GitHub Profile
-                    </span>
+                    <a href={currentUser.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface/50 hover:bg-surface border border-white/5 transition-colors text-sm font-medium">
+                      <Code className="w-4 h-4 text-fg" /> GitHub Profile
+                    </a>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>
                   <div className="flex justify-between items-center bg-surface/30 border border-border/80 rounded-xl p-3.5">
-                    <span className="text-xs font-bold text-fg-muted flex items-center gap-2">
-                      <Linkedin className="w-4 h-4 text-blue" /> LinkedIn Profile
-                    </span>
+                    <a href={currentUser.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 rounded bg-surface/50 hover:bg-surface border border-white/5 transition-colors text-sm font-medium">
+                      <Briefcase className="w-4 h-4 text-blue" /> LinkedIn Profile
+                    </a>
                     <span className="text-[10px] text-green font-bold">// linked</span>
                   </div>
                 </div>

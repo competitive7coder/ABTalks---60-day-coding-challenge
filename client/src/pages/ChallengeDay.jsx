@@ -7,11 +7,13 @@ import {
   User, 
   Flame, 
   ClipboardCheck, 
-  Github, 
-  Linkedin, 
-  CheckCircle2, 
-  Sparkles,
-  Zap
+  Code, 
+  Briefcase, 
+  Monitor, 
+  ExternalLink,
+  Zap,
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 
 export default function ChallengeDay() {
