@@ -557,7 +557,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Stage base shimmer */}
-                <div className="h-[3px] w-full shrink-0" style={{ background: 'linear-gradient(to right, rgba(148,163,184,0.4), rgba(250,204,21,0.7), rgba(217,119,6,0.4))' }}></div>
+                <div className="h-0.75 w-full shrink-0" style={{ background: 'linear-gradient(to right, rgba(148,163,184,0.4), rgba(250,204,21,0.7), rgba(217,119,6,0.4))' }}></div>
               </div>
             )}
 

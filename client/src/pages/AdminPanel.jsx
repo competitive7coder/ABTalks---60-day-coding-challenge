@@ -415,7 +415,7 @@ export default function AdminPanel() {
 
               <button 
                 type="submit" 
-                className="w-full py-3 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 shadow-blue-glow transition-all cursor-pointer uppercase font-black"
+                className="w-full py-3 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 shadow-blue-glow transition-all cursor-pointer uppercase"
               >
                 {editingId ? 'Update Roadmap Task' : 'Create Roadmap Task'}
               </button>
