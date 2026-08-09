@@ -52,7 +52,7 @@ export const getCurrentUser = () => {
     });
 };
 
-export const createChallenge = (track) => {
+export const createChallenge = (track , linkedin , github) => {
     return apiRequest("/api/challenge/create", {
         method: "POST",
         body: JSON.stringify({ track }),

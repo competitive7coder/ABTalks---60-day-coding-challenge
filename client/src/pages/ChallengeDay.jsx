@@ -298,7 +298,7 @@ export default function ChallengeDay() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3.5">
+        <div className="flex flex-col gap-1.5">
           {/* Resources */}
           <div className="glass-panel rounded-2xl p-3.5">
             <h3 className="text-[10px] text-blue font-bold tracking-wider uppercase mb-2 flex items-center gap-1.5">
@@ -402,7 +402,7 @@ export default function ChallengeDay() {
       </div>
 
       {/* Day Navigation */}
-      <div className="flex gap-2.5 my-6 max-w-300 mx-auto px-5 md:px-10">
+      <div className="flex gap-2.5 my-2 max-w-300 mx-auto px-5 md:px-10">
         <button className="flex-1 py-3 bg-surface-glass backdrop-blur-md border border-border rounded-xl text-fg text-xs font-bold flex items-center justify-center gap-1.5 hover:border-border-light hover:-translate-y-0.5 transition-all cursor-pointer" onClick={handlePrevDay}>
           <svg className="w-3.5 h-3.5 stroke-fg stroke-[2.5] fill-none" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
           Day {currentDayNum > 1 ? currentDayNum - 1 : 1}

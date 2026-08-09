@@ -301,10 +301,9 @@ export default function Dashboard() {
             <div className="pt-5 pb-2 flex items-center gap-2 px-5 md:px-11 max-w-300 mx-auto">
               <div>
                 <h1 className="text-lg font-extrabold mb-0.5 flex items-center gap-1.5">
-                  Hey {user?.name}!
-                  <Flame className="w-4.5 h-4.5 text-orange fill-orange animate-pulse" />
+                  Hey {user?.name} !
                 </h1>
-                <p className="text-fg-dark text-[11px]">You're on fire â€” Day {displayDay} of 60</p>
+                <p className="text-fg-dark text-[11px]">You're on fire Day {displayDay} of 60</p>
               </div>
             </div>
 
