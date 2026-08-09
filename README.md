@@ -1,7 +1,6 @@
 # ⚡ ABTalks — 60-Day Cohort Coding Challenge
 
-> A premium, gamified developer accountability hub. Build consistency, unlock streaks, and climb the leaderboard alongside your cohort.
-
+> A gamified 60-day coding challenge platform built to help developers stay consistent, follow structured roadmaps, complete daily tasks, earn points, maintain streaks, and climb the leaderboard.
 ---
 
 ## ## 🔑 Demo Credentials
@@ -22,12 +21,16 @@ The following credentials can be used to test the different user roles in ABTalk
 
 > ⚠️ These are demo credentials intended for testing and demonstration purposes only.
 
-## 🎨 Creative & Futuristic Design System
+## 🎨 Modern & Gamified Design System
 
-ABTalks is built with a hackathon-winning, developer-first aesthetic featuring:
-* **🌌 Subtle Code Rain Canvas**: A high-performance HTML5 canvas particle rain background rendering falling binary/ASCII characters in glowing blue and purple tones.
-* **🔥 Dynamic 20-Column Heatmap**: A custom-designed, Duolingo-style grid calendar replacing day numbers with glowing flame emojis (`🔥`) on completed days to showcase consistency.
-* **🛡️ Futuristic Profile Dashboards**: Mac-style sub-panels displaying cohort details, social linkage statuses, and a secure crimson session disconnect controller.
+ABTalks is designed with a clean, responsive, and developer-focused interface featuring:
+
+- **📱 Responsive UI**: Optimized for desktop, tablet, and mobile devices to provide a consistent experience across screen sizes.
+- **🔥 Streak-Based Progress**: Visual progress indicators help users track their daily consistency throughout the 60-day challenge.
+- **🏆 Gamified Experience**: Points, rankings, and leaderboard elements encourage users to stay consistent and compete with other participants.
+- **🗺️ Roadmap-Driven Interface**: Structured challenge roadmaps make it easy for users to navigate their daily tasks and track their journey.
+- **📊 Progress Dashboard**: Users can view their challenge progress, completed tasks, current streak, and ranking from a centralized dashboard.
+- **🛠️ Admin Dashboard**: Admin-focused interfaces allow challenge and roadmap management, including creating and modifying daily tasks.
 
 ---
 
