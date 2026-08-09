@@ -22,7 +22,7 @@ The following credentials can be used to test the different user roles in ABTalk
 
 ### 👨‍🎓 Normal User Account
 
-- **Email:** pallab@gmail.com
+- **Email:** ayush@gmail.com
 - **Password:** 123
 - **Role:** Normal User
 
