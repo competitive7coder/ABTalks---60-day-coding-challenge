@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getCurrentUser, getChallengeByDay, submitChallenge, getSubmissions } from '../api';
-import { 
-  Home, 
-  Trophy, 
-  User, 
-  Flame, 
-  ClipboardCheck, 
-  CheckCircle2, 
+import {
+  Home,
+  Trophy,
+  User,
+  Flame,
+  ClipboardCheck,
+  CheckCircle2,
   Sparkles,
   Zap
 } from 'lucide-react';

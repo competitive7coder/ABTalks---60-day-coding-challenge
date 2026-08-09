@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getCurrentUser, getCurrentChallenge, getSubmissions, createChallenge, getLeaderboard, logOut } from '../api';
+import { getCurrentChallenge, getSubmissions, createChallenge, getLeaderboard } from '../api';
 import {
   Home,
   Trophy,
@@ -17,6 +17,10 @@ import {
   Shield
 } from 'lucide-react';
 import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+
+import SummaryApi from '../util/SummaryApi';
+import Axios from '../util/Axios';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -31,11 +35,16 @@ export default function Dashboard() {
   const [noChallenge, setNoChallenge] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState('Full Stack');
   const [initializing, setInitializing] = useState(false);
+  const [currentBlock, setCurrentBlock] = useState(0);
 
   const handleLogout = async () => {
     try {
-      await logOut();
-      navigate('/');
+      const response = await Axios({
+        ...SummaryApi.logout
+      })
+
+      localStorage.removeItem("login")
+      navigate("/")
     } catch (err) {
       console.error(err);
       alert('Failed to terminate session securely. Redirecting...');
@@ -61,8 +70,12 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadDashboard() {
       try {
-        const userRes = await getCurrentUser();
-        setUser(userRes.data);
+
+        const userRes = await Axios({
+          ...SummaryApi.getCurrentUserDetails
+        })
+
+        setUser(userRes.data?.data)
 
         let challengeData;
         try {
@@ -117,21 +130,37 @@ export default function Dashboard() {
   const progressPercent = Math.round(((displayDay - (isCompleted ? 0 : 1)) / (challenge?.total_day || 60)) * 100);
 
   // Get days list to render in calendar card
+  const totalDays = challenge?.total_day || 60;
+  const DAYS_PER_BLOCK = 20;
+  const totalBlocks = Math.ceil(totalDays / DAYS_PER_BLOCK);
+
   const completedDaysSet = new Set(submissions.map(s => s.day));
-  const renderedDays = Array.from({ length: 20 }, (_, i) => {
-    const dayNum = i + 1;
-    const completed = completedDaysSet.has(dayNum);
-    const current = dayNum === displayDay && !completed;
-    const missed = dayNum < displayDay && !completed;
-    const upcoming = dayNum > displayDay;
-    return {
-      day: dayNum,
-      completed,
-      current,
-      missed,
-      upcoming
-    };
-  });
+  const startDay = currentBlock * DAYS_PER_BLOCK + 1;
+  const endDay = Math.min(
+    startDay + DAYS_PER_BLOCK - 1,
+    totalDays
+  );
+
+  const renderedDays = Array.from(
+    { length: endDay - startDay + 1 },
+    (_, i) => {
+      const dayNum = startDay + i;
+
+      const completed = completedDaysSet.has(dayNum);
+      const current = dayNum === displayDay && !completed;
+      const missed = dayNum < displayDay && !completed;
+      const upcoming = dayNum > displayDay;
+
+      return {
+        day: dayNum,
+        completed,
+        current,
+        missed,
+        upcoming
+      };
+    }
+  );
+
 
   // Calculate dynamic leaderboard merged with mock metrics for testing/hackathon view
   const combinedLeaderboard = [...leaderboard].map(u => ({
@@ -206,40 +235,40 @@ export default function Dashboard() {
                   <p className="text-[10px] text-fg-dark">You are an admin. Click here to bypass the student curriculum and manage the platform.</p>
                 </div>
               )}
-              
+
               <div className="flex flex-col gap-2.5 text-left mb-6 h-64 overflow-y-auto pr-2 scrollbar-thin">
-                <div 
-                  onClick={() => setSelectedTrack('Full Stack')} 
+                <div
+                  onClick={() => setSelectedTrack('Full Stack')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Full Stack' ? 'bg-blue/10 border-blue shadow-[0_0_15px_var(--blue-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Full Stack (Web Dev)</h4>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('Frontend')} 
+                <div
+                  onClick={() => setSelectedTrack('Frontend')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Frontend' ? 'bg-cyan/10 border-cyan shadow-[0_0_15px_var(--cyan-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Frontend (UI/UX)</h4>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('Backend')} 
+                <div
+                  onClick={() => setSelectedTrack('Backend')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Backend' ? 'bg-purple/10 border-purple shadow-[0_0_15px_var(--purple-glow)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Backend (APIs & DB)</h4>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('AI/ML')} 
+                <div
+                  onClick={() => setSelectedTrack('AI/ML')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'AI/ML' ? 'bg-orange/10 border-orange shadow-[0_0_15px_rgba(255,165,0,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">AI / Machine Learning</h4>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('Mobile')} 
+                <div
+                  onClick={() => setSelectedTrack('Mobile')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'Mobile' ? 'bg-green/10 border-green shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">Mobile App Development</h4>
                 </div>
-                <div 
-                  onClick={() => setSelectedTrack('DSA')} 
+                <div
+                  onClick={() => setSelectedTrack('DSA')}
                   className={`p-3 rounded-xl border cursor-pointer transition-all duration-300 ${selectedTrack === 'DSA' ? 'bg-pink/10 border-pink shadow-[0_0_15px_rgba(236,72,153,0.3)]' : 'bg-surface/30 border-border hover:bg-surface/50'}`}
                 >
                   <h4 className="text-xs font-black text-fg mb-0.5">DSA & Algorithms</h4>
@@ -256,200 +285,230 @@ export default function Dashboard() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 px-5 py-2 md:grid-cols-[1.9fr_1.2fr] md:gap-5 md:px-10 md:py-3 max-w-300 mx-auto anim-scaleIn">
-            <div className="flex flex-col gap-3.5">
-              <div className="py-1 flex items-center gap-2">
-                <div>
-                  <h1 className="text-lg font-extrabold mb-0.5 flex items-center gap-1.5">
-                    Hey {user?.name}!
-                    <Flame className="w-4.5 h-4.5 text-orange fill-orange animate-pulse" />
-                  </h1>
-                  <p className="text-fg-dark text-[11px]">You're on fire â€” Day {displayDay} of 60</p>
-                </div>
-              </div>
-
-            {/* Streak Card */}
-            <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
-              <div className="flex justify-between items-start mb-3 relative z-10">
-                <div className="flex items-center gap-2">
-                  <div className="text-right">
-                    <div className="text-xs font-bold tracking-widest text-transparent bg-clip-text bg-linear-to-r from-orange to-red uppercase drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
-                      {displayStreak === 0 ? "START YOUR ENGINE" : "STREAK_ACTIVE"}
-                    </div>
-                    <div className="text-fg-dark text-[10px] mt-1">
-                      {displayStreak === 0 ? "First submission ignites the flame" : `days strong · Best: ${user?.longest_streak || 0}`}
-                    </div>
-                  </div>
-                  <div className={`text-3xl filter ${displayStreak > 0 ? 'drop-shadow-orange-glow anim-flame' : 'grayscale opacity-50'}`}>
-                    {displayStreak > 0 ? (
-                      <Flame className="w-9 h-9 text-orange fill-orange" />
-                    ) : (
-                      <Flame className="w-9 h-9 text-fg-dark fill-fg-dark" />
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Horizontal swipable calendar for better mobile UX */}
-              <div className="calendar relative z-10 flex overflow-x-auto gap-2 pb-2 scrollbar-thin snap-x">
-                {renderedDays.map((day) => (
-                  <div
-                    key={day.day}
-                    className={`calendar-day shrink-0 snap-center w-12 h-12 flex items-center justify-center rounded-xl border transition-all duration-300 cursor-pointer ${
-                      day.completed ? 'bg-orange/20 border-orange shadow-[0_0_12px_rgba(249,115,22,0.3)] text-orange' : 
-                      day.missed ? 'bg-cyan/10 border-cyan/40 text-cyan/70 shadow-[inset_0_0_8px_rgba(6,182,212,0.2)]' : // Frozen streak mechanic
-                      day.current ? 'bg-blue/15 border-blue shadow-[0_0_12px_rgba(59,130,246,0.3)] text-blue scale-110 relative z-10' : 
-                      'bg-surface-glass border-border-light text-fg-muted hover:border-fg-dark'
-                    }`}
-                    onClick={() => navigate(`/day/${day.day}`)}
-                    style={{ fontSize: day.completed || day.missed ? '16px' : '11px', fontWeight: 'bold' }}
-                  >
-                    {day.completed ? '🔥' : day.missed ? '🧊' : day.day}
-                  </div>
-                ))}
+          <>
+            <div className="pt-5 pb-2 flex items-center gap-2 px-5 md:px-11 max-w-300 mx-auto">
+              <div>
+                <h1 className="text-lg font-extrabold mb-0.5 flex items-center gap-1.5">
+                  Hey {user?.name}!
+                  <Flame className="w-4.5 h-4.5 text-orange fill-orange animate-pulse" />
+                </h1>
+                <p className="text-fg-dark text-[11px]">You're on fire â€” Day {displayDay} of 60</p>
               </div>
             </div>
 
-              {/* Today's Task */}
-              <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
-                <div className="flex justify-between items-center mb-2.5">
-                  <span className="inline-flex items-center gap-1.5 bg-blue/12 text-blue px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
-                    <Sparkles className="w-3 h-3" /> {challenge?.challenge_name} Track
-                  </span>
-                  <span className="text-fg-dark text-[9px] flex items-center gap-1">
-                    ~2 hrs
-                  </span>
-                </div>
-                <h3 className="text-sm font-bold mb-1 leading-snug">{currentTask.task || "Start Coding..."}</h3>
-                <p className="text-fg-dark text-[11px] leading-relaxed mb-2.5">{currentTask.description || "Deploy daily commits to secure your coding streaks."}</p>
-                <div className="flex gap-3 mb-4 flex-wrap">
-                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                    <Zap className="w-3.5 h-3.5 text-yellow" /> {currentTask.difficulty_level || "Medium"}
-                  </span>
-                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                    💻 {(() => {
-                      const name = challenge?.challenge_name || '';
-                      if (name === 'Frontend') return 'React, CSS';
-                      if (name === 'Backend') return 'Node, DB';
-                      if (name === 'AI/ML') return 'Python, PyTorch';
-                      if (name === 'DSA') return 'C++, Java';
-                      if (name === 'Mobile') return 'React Native';
-                      if (name === 'Full Stack') return 'MERN Stack';
-                      return 'Core Tech';
-                    })()}
-                  </span>
-                  <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
-                    🎯 Deploy
-                  </span>
-                </div>
-                {isCompleted ? (
-                  <button className="w-full py-3.5 bg-linear-to-r from-green to-[#9ece6acc] text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1" onClick={() => navigate(`/day/${displayDay}`)}>
-                    <CheckCircle2 className="w-4 h-4" /> challenge_completed
-                  </button>
-                ) : (
-                  <button className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] transition-all duration-300 cursor-pointer anim-gradient" onClick={() => navigate(`/day/${displayDay}`)}>
-                    Start Day {displayDay} →
-                  </button>
-                )}
-              </div>
-            </div>
+            <div className="grid grid-cols-1 gap-4 px-5 py-0.5 md:grid-cols-[1.9fr_1.2fr] md:gap-5 md:px-10 max-w-300 mx-auto anim-scaleIn">
 
-            <div className="flex flex-col gap-3">
-              {/* Progress */}
-              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-xs font-bold">Challenge Progress</h3>
-                  <span className="text-xs font-extrabold text-blue">{progressPercent}%</span>
-                </div>
-                <div className="h-1.5 bg-fg/6 rounded-full overflow-hidden mb-1.5 relative">
-                  <div className="h-full bg-linear-to-r from-blue via-purple to-cyan anim-gradient transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
-                </div>
-                <div className="flex justify-between text-[9px] text-fg-dark">
-                  <span>Day {isCompleted ? displayDay : displayDay - 1}</span>
-                  <span>Day 60</span>
-                </div>
-              </div>
+              <div className="flex flex-col gap-3.5">
 
-              {/* Peer Pod */}
-              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-                <div className="flex justify-between items-center mb-2.5">
-                  <h3 className="text-xs font-bold flex items-center gap-2">
-                    <Users className="w-4 h-4 text-blue" /> Your Peer Pod
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-green rounded-full relative after:content-[''] after:absolute after:-inset-0.5 after:rounded-full after:bg-green anim-ring-pulse"></span>
+                {/* Streak Card */}
+                <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
+
+                  <div className="flex justify-between items-start mb-3 relative z-10">
+
+                    <div className="flex items-center gap-2">
+                      <div className="text-right">
+                        <div className="text-xs font-bold tracking-widest text-transparent bg-clip-text bg-linear-to-r from-orange to-red uppercase drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]">
+                          {displayStreak === 0 ? "START YOUR ENGINE" : "STREAK_ACTIVE"}
+                        </div>
+                        <div className="text-fg-dark text-[10px] mt-1">
+                          {displayStreak === 0 ? "First submission ignites the flame" : `days strong · Best: ${user?.longest_streak || 0}`}
+                        </div>
+                      </div>
+                      <div className={`text-3xl filter ${displayStreak > 0 ? 'drop-shadow-orange-glow anim-flame' : 'grayscale opacity-50'}`}>
+                        {displayStreak > 0 ? (
+                          <Flame className="w-9 h-9 text-orange fill-orange" />
+                        ) : (
+                          <Flame className="w-9 h-9 text-fg-dark fill-fg-dark" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className='flex gap-4 items-center'>
+                      <FaAngleLeft
+                        size={20}
+                        className={`cursor-pointer ${currentBlock === 0 ? "opacity-30 cursor-not-allowed" : ""
+                          }`}
+                        onClick={() => {
+                          if (currentBlock > 0) {
+                            setCurrentBlock(prev => prev - 1);
+                          }
+                        }}
+                      />
+
+                      <FaAngleRight
+                        size={20}
+                        className={`cursor-pointer ${currentBlock === totalBlocks - 1 ? "opacity-30 cursor-not-allowed" : ""
+                          }`}
+                        onClick={() => {
+                          if (currentBlock < totalBlocks - 1) {
+                            setCurrentBlock(prev => prev + 1);
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Horizontal swipable calendar for better mobile UX */}
+                  <div className="calendar relative z-10 flex overflow-x-auto gap-2 scrollbar-thin snap-x p-2">
+                    {renderedDays.map((day) => (
+                      <div
+                        key={day.day}
+                        className={`calendar-day shrink-0 snap-center w-12 h-12 flex items-center justify-center rounded-xl border transition-all duration-300 cursor-pointer ${day.completed ? 'bg-orange/20 border-orange shadow-[0_0_12px_rgba(249,115,22,0.3)] text-orange' :
+                          day.missed ? 'bg-cyan/10 border-cyan/40 text-cyan/70 shadow-[inset_0_0_8px_rgba(6,182,212,0.2)]' : // Frozen streak mechanic
+                            day.current ? 'bg-blue/15 border-blue shadow-[0_0_12px_rgba(59,130,246,0.3)] text-blue scale-110 relative z-10' :
+                              'bg-surface-glass border-border-light text-fg-muted hover:border-fg-dark'
+                          }`}
+                        onClick={() => navigate(`/day/${day.day}`)}
+                        style={{ fontSize: day.completed || day.missed ? '16px' : '11px', fontWeight: 'bold' }}
+                      >
+                        {day.completed ? '🔥' : day.missed ? '🧊' : day.day}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Today's Task */}
+                <div className="glass-panel rounded-2xl p-4 relative overflow-hidden border border-border-light hover:shadow-[0_8px_32px_rgba(122,162,247,0.15)] transition-all duration-300">
+                  <div className="flex justify-between items-center mb-2.5">
+                    <span className="inline-flex items-center gap-1.5 bg-blue/12 text-blue px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider">
+                      <Sparkles className="w-3 h-3" /> {challenge?.challenge_name} Track
                     </span>
-                  </h3>
-                  <span className="text-[9px] text-fg-dark">3 online</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-red to-orange">AS</div>
-                    <div className="flex-1">
-                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Ananya Sharma</h4>
-                      <p className="text-[9px] text-fg-dark">Just submitted Day 12 · 2m ago</p>
-                    </div>
-                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 14
-                    </div>
+                    <span className="text-fg-dark text-[9px] flex items-center gap-1">
+                      ~2 hrs
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-green to-cyan">VP</div>
-                    <div className="flex-1">
-                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Vikram Patel</h4>
-                      <p className="text-[9px] text-fg-dark">Working on Day 12 · 15m ago</p>
-                    </div>
-                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 11
-                    </div>
+                  <h3 className="text-sm font-bold mb-1 leading-snug">{currentTask.task || "Start Coding..."}</h3>
+                  <p className="text-fg-dark text-[11px] leading-relaxed mb-2.5">{currentTask.description || "Deploy daily commits to secure your coding streaks."}</p>
+                  <div className="flex gap-3 mb-4 flex-wrap">
+                    <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                      <Zap className="w-3.5 h-3.5 text-yellow" /> {currentTask.difficulty_level || "Medium"}
+                    </span>
+                    <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                      💻 {(() => {
+                        const name = challenge?.challenge_name || '';
+                        if (name === 'Frontend') return 'React, CSS';
+                        if (name === 'Backend') return 'Node, DB';
+                        if (name === 'AI/ML') return 'Python, PyTorch';
+                        if (name === 'DSA') return 'C++, Java';
+                        if (name === 'Mobile') return 'React Native';
+                        if (name === 'Full Stack') return 'MERN Stack';
+                        return 'Core Tech';
+                      })()}
+                    </span>
+                    <span className="text-[10px] text-fg-dark flex items-center gap-1 font-medium">
+                      🎯 Deploy
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-purple to-magenta">SK</div>
-                    <div className="flex-1">
-                      <h4 className="text-[11px] font-bold text-fg mb-0.5">Sneha Kumar</h4>
-                      <p className="text-[9px] text-fg-dark">Completed Day 11 · 1h ago</p>
-                    </div>
-                    <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
-                      <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 9
-                    </div>
-                  </div>
+                  {isCompleted ? (
+                    <button className="w-full py-3.5 bg-linear-to-r from-green to-[#9ece6acc] text-bg font-bold rounded-xl text-xs hover:-translate-y-0.5 transition-all duration-300 cursor-pointer flex items-center justify-center gap-1" onClick={() => navigate(`/day/${displayDay}`)}>
+                      <CheckCircle2 className="w-4 h-4" /> challenge_completed
+                    </button>
+                  ) : (
+                    <button className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] transition-all duration-300 cursor-pointer anim-gradient" onClick={() => navigate(`/day/${displayDay}`)}>
+                      Start Day {displayDay} →
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Achievements */}
-              <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
-                <h3 className="text-xs font-bold mb-2.5 flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-purple" /> Achievements
-                </h3>
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="text-center group cursor-pointer">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-orange/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300">
-                      <Flame className="w-5 h-5 text-orange fill-orange" />
-                    </div>
-                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">7-Day</p>
+              <div className="flex flex-col gap-3">
+                {/* Progress */}
+                <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xs font-bold">Challenge Progress</h3>
+                    <span className="text-xs font-extrabold text-blue">{progressPercent}%</span>
                   </div>
-                  <div className="text-center group cursor-pointer">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-green/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300 text-xs">
-                      🚀
-                    </div>
-                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Deploy</p>
+                  <div className="h-1.5 bg-fg/6 rounded-full overflow-hidden mb-1.5 relative">
+                    <div className="h-full bg-linear-to-r from-blue via-purple to-cyan anim-gradient transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
                   </div>
-                  <div className="text-center badge-locked">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
-                      💎
-                    </div>
-                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">30-Day</p>
+                  <div className="flex justify-between text-[9px] text-fg-dark">
+                    <span>Day {isCompleted ? displayDay : displayDay - 1}</span>
+                    <span>Day 60</span>
                   </div>
-                  <div className="text-center badge-locked">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
-                      👑
+                </div>
+
+                {/* Peer Pod */}
+                <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                  <div className="flex justify-between items-center mb-2.5">
+                    <h3 className="text-xs font-bold flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue" /> Your Peer Pod
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-green rounded-full relative after:content-[''] after:absolute after:-inset-0.5 after:rounded-full after:bg-green anim-ring-pulse"></span>
+                      </span>
+                    </h3>
+                    <span className="text-[9px] text-fg-dark">3 online</span>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-red to-orange">AS</div>
+                      <div className="flex-1">
+                        <h4 className="text-[11px] font-bold text-fg mb-0.5">Ananya Sharma</h4>
+                        <p className="text-[9px] text-fg-dark">Just submitted Day 12 · 2m ago</p>
+                      </div>
+                      <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                        <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 14
+                      </div>
                     </div>
-                    <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Top 10%</p>
+                    <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-green to-cyan">VP</div>
+                      <div className="flex-1">
+                        <h4 className="text-[11px] font-bold text-fg mb-0.5">Vikram Patel</h4>
+                        <p className="text-[9px] text-fg-dark">Working on Day 12 · 15m ago</p>
+                      </div>
+                      <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                        <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 11
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2.5 p-2 bg-fg/4 rounded-xl hover:bg-fg/8 hover:translate-x-1 transition-all duration-300 cursor-pointer">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-bg bg-linear-to-br from-purple to-magenta">SK</div>
+                      <div className="flex-1">
+                        <h4 className="text-[11px] font-bold text-fg mb-0.5">Sneha Kumar</h4>
+                        <p className="text-[9px] text-fg-dark">Completed Day 11 · 1h ago</p>
+                      </div>
+                      <div className="flex items-center gap-0.5 text-[10px] font-bold text-orange">
+                        <Flame className="w-3.5 h-3.5 fill-orange text-orange" /> 9
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Achievements */}
+                <div className="glass-panel rounded-2xl p-3.5 border border-border-light">
+                  <h3 className="text-xs font-bold mb-2.5 flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-purple" /> Achievements
+                  </h3>
+                  <div className="grid grid-cols-4 gap-2">
+                    <div className="text-center group cursor-pointer">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-orange/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300">
+                        <Flame className="w-5 h-5 text-orange fill-orange" />
+                      </div>
+                      <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">7-Day</p>
+                    </div>
+                    <div className="text-center group cursor-pointer">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-green/12 group-hover:scale-110 hover:shadow-lg transition-all duration-300 text-xs">
+                        🚀
+                      </div>
+                      <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Deploy</p>
+                    </div>
+                    <div className="text-center badge-locked">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
+                        💎
+                      </div>
+                      <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">30-Day</p>
+                    </div>
+                    <div className="text-center badge-locked">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1 bg-fg/6 text-xs">
+                        👑
+                      </div>
+                      <p className="text-[8px] text-fg-dark font-semibold uppercase tracking-wider">Top 10%</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          </>
+        ))
+      }
 
       {/* 2. LEADERBOARD TAB */}
       {activeTab === 'board' && (
@@ -609,6 +668,7 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
       {/* 3. PROFILE TAB */}
       {activeTab === 'profile' && (
         <div className="px-5 py-4 max-w-280 mx-auto anim-scaleIn">
@@ -706,7 +766,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Bottom Navigation Tabs with Emojis */}
+
       {/* Bottom Navigation Tabs with Lucide Icons */}
       <nav className="bottom-nav">
         <button className={`nav-item ${activeTab === 'home' ? 'active' : ''}`} onClick={() => setActiveTab('home')}>

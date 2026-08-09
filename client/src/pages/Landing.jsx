@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signUp, signIn, createChallenge } from '../api';
+import SummaryApi from '../util/SummaryApi';
+import Axios from '../util/Axios';
 
 export default function Landing({ setMockUser }) {
   const navigate = useNavigate();
@@ -119,27 +121,48 @@ export default function Landing({ setMockUser }) {
       if (isSignUp) {
         // Register the user
         await signUp(username, email, password);
-        
+
         // Save selected track to local storage so it gets created once they sign in
-        sessionStorage.setItem('chosen_track', track);
+        localStorage.setItem('chosen_track', track);
 
         setSuccessMsg('Registration successful! Please sign in.');
         setIsSignUp(false);
       } else {
         // Just log in
-        const loginRes = await signIn(email, password);
-        setShowAuthModal(false);
-        // Admins go directly to their panel; everyone else goes to dashboard
-        if (loginRes?.data?.role === 'admin') {
-          navigate('/admin');
-        } else {
+        // const loginRes = await signIn(email, password);
+        // setShowAuthModal(false);
+        // // Admins go directly to their panel; everyone else goes to dashboard
+        // if (loginRes?.data?.role === 'admin') {
+        //   navigate('/admin');
+        // } else {
+        //   navigate('/dashboard');
+        // }
+        const response = await Axios({
+          ...SummaryApi.sign_in,
+          data: {
+            email,
+            password
+          }
+        })
+
+        if (response?.data?.success) {
+          localStorage.setItem("login", "true");
           navigate('/dashboard');
         }
+
       }
     } catch (err) {
       setErrorMsg(err.message || 'An error occurred during authentication');
     }
   };
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("login") === "true";
+
+    if (isLoggedIn) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-bg text-fg font-sans relative overflow-x-hidden selection:bg-blue/30 selection:text-blue">
@@ -158,7 +181,7 @@ export default function Landing({ setMockUser }) {
           </div>
           <span>ABTalks</span>
         </div>
-        <button 
+        <button
           className="px-4 py-2 bg-surface-glass backdrop-blur-md border border-border-light text-fg rounded-xl text-xs font-semibold hover:border-blue hover:shadow-blue-glow hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
           onClick={() => { setIsSignUp(false); setShowAuthModal(true); }}
         >
@@ -181,14 +204,14 @@ export default function Landing({ setMockUser }) {
               Join 10,000+ Indian college students in a 60-day coding challenge. Build daily, post publicly, and make yourself impossible to ignore.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 md:max-w-115">
-              <button 
+              <button
                 className="w-full sm:w-auto px-8 py-4 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-sm shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden anim-gradient"
                 onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
               >
                 $ start-challenge --now
               </button>
-              <a 
-                href="#how" 
+              <a
+                href="#how"
                 className="w-full sm:w-auto px-8 py-4 bg-surface-glass backdrop-blur-md border border-border-light text-fg font-semibold rounded-xl text-xs flex items-center justify-center hover:border-purple hover:shadow-purple-glow transition-all duration-300"
               >
                 $ man how-it-works
@@ -209,13 +232,13 @@ export default function Landing({ setMockUser }) {
             </div>
             <div className="p-4 font-mono text-[10.5px] leading-relaxed text-fg-muted h-64 overflow-y-auto flex flex-col gap-1.5 scrollbar-thin">
               {terminalHistory.map((item, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className={
-                    item.type === 'command' ? 'text-fg font-bold drop-shadow-[0_0_8px_rgba(241,245,249,0.15)]' : 
-                    item.type === 'response' ? 'text-fg-muted/80' : 
-                    item.type === 'success' ? 'text-green font-bold drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]' : 
-                    item.type === 'error' ? 'text-red font-bold' : 'text-cyan font-semibold'
+                    item.type === 'command' ? 'text-fg font-bold drop-shadow-[0_0_8px_rgba(241,245,249,0.15)]' :
+                      item.type === 'response' ? 'text-fg-muted/80' :
+                        item.type === 'success' ? 'text-green font-bold drop-shadow-[0_0_8px_rgba(16,185,129,0.2)]' :
+                          item.type === 'error' ? 'text-red font-bold' : 'text-cyan font-semibold'
                   }
                   style={{ whiteSpace: 'pre-wrap' }}
                 >
@@ -225,11 +248,11 @@ export default function Landing({ setMockUser }) {
             </div>
             <form onSubmit={handleTerminalSubmit} className="bg-bg-dark/60 border-t border-border flex items-center px-4 py-3.5">
               <span className="text-fg-dark font-mono text-xs select-none mr-2">➜ /challenge/cohort-07 [master] $</span>
-              <input 
-                type="text" 
-                value={terminalInput} 
-                onChange={(e) => setTerminalInput(e.target.value)} 
-                placeholder="Type 'help' and press Enter..." 
+              <input
+                type="text"
+                value={terminalInput}
+                onChange={(e) => setTerminalInput(e.target.value)}
+                placeholder="Type 'help' and press Enter..."
                 className="flex-1 bg-transparent border-none outline-hidden text-xs text-green font-mono caret-green p-0"
               />
             </form>
@@ -277,7 +300,7 @@ export default function Landing({ setMockUser }) {
           <div className="relative flex flex-col gap-5 md:grid md:grid-cols-3 md:gap-6">
             {/* Dotted path connector for large displays */}
             <div className="hidden md:block absolute top-[28px] left-[15%] right-[15%] h-[2px] border-t-2 border-dashed border-border-light -z-1"></div>
-            
+
             <div className="glass-panel rounded-2xl p-5 flex gap-3.5 items-start hover:border-blue/35 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
               <div className="w-8.5 h-8.5 bg-linear-to-br from-blue to-purple rounded-xl flex items-center justify-center font-black text-xs text-bg shadow-blue-glow group-hover:scale-105 transition-transform duration-300">01</div>
               <div className="flex-1">
@@ -309,7 +332,7 @@ export default function Landing({ setMockUser }) {
         <section className="py-6">
           <h2 className="text-base font-black text-center mb-6 relative after:content-[''] after:block after:w-10 after:h-0.5 after:bg-linear-to-r after:from-blue after:to-purple after:mx-auto after:mt-2 after:rounded uppercase tracking-wide">Choose Your Track</h2>
           <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3 md:gap-5 max-w-250 mx-auto">
-            <div 
+            <div
               className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-blue hover:shadow-[0_0_20px_var(--blue-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
               onClick={() => { setTrack('Full Stack'); setShowAuthModal(true); setIsSignUp(true); }}
             >
@@ -323,7 +346,7 @@ export default function Landing({ setMockUser }) {
               </div>
             </div>
 
-            <div 
+            <div
               className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-purple hover:shadow-[0_0_20px_var(--purple-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
               onClick={() => { setTrack('Frontend'); setShowAuthModal(true); setIsSignUp(true); }}
             >
@@ -337,7 +360,7 @@ export default function Landing({ setMockUser }) {
               </div>
             </div>
 
-            <div 
+            <div
               className="glass-panel rounded-2xl p-5 text-left cursor-pointer border border-border/80 hover:border-cyan hover:shadow-[0_0_20px_var(--cyan-glow)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group"
               onClick={() => { setTrack('Backend'); setShowAuthModal(true); setIsSignUp(true); }}
             >
@@ -428,7 +451,7 @@ export default function Landing({ setMockUser }) {
             </div>
             <div className="text-[10px] text-green">// [SUCCESS] ALL CHALLENGE CHANNELS LIVE AND OPEN FOR ENTRIES</div>
           </div>
-          <button 
+          <button
             className="w-full py-4.5 bg-linear-to-r from-blue to-purple text-bg font-extrabold rounded-xl text-sm shadow-blue-glow hover:-translate-y-0.5 hover:shadow-[0_8px_32px_var(--blue-glow)] active:translate-y-0 transition-all duration-300 cursor-pointer anim-gradient uppercase tracking-wider"
             onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
           >
@@ -450,7 +473,7 @@ export default function Landing({ setMockUser }) {
           <div className="bg-bg-dark border border-border-light rounded-2xl w-[90%] max-w-90 p-6 shadow-2xl anim-scaleIn" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-extrabold mb-1.5">&gt;_ {isSignUp ? 'sign-up' : 'sign-in'}</h2>
             <p className="text-[11px] text-fg-dark mb-5">{isSignUp ? 'Create your profile to start coding' : 'Log in to your 60-day dashboard'}</p>
-            
+
             {errorMsg && (
               <div className="bg-red/15 text-red border border-red/35 rounded-xl p-3 text-xs mb-4 font-bold">
                 ⚠️ {errorMsg}
@@ -477,7 +500,7 @@ export default function Landing({ setMockUser }) {
                   />
                 </div>
               )}
-              
+
               <div>
                 <label className="text-[11px] font-bold mb-1.5 flex items-center gap-1 text-fg-muted">Email</label>
                 <input
