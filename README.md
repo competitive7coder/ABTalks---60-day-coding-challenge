@@ -4,25 +4,57 @@
 
 ---
 
+## ## 🔑 Demo Credentials
+
+The following credentials can be used to test the different user roles in ABTalks.
+
+### 👨‍💼 Admin Account
+
+- **Email:** rahul@gmail.com
+- **Password:** 123
+- **Role:** Admin
+
+### 👨‍🎓 Normal User Account
+
+- **Email:** pallab@gmail.com
+- **Password:** 123
+- **Role:** Normal User
+
+> ⚠️ These are demo credentials intended for testing and demonstration purposes only.
+
 ## 🎨 Creative & Futuristic Design System
 
 ABTalks is built with a hackathon-winning, developer-first aesthetic featuring:
 * **🌌 Subtle Code Rain Canvas**: A high-performance HTML5 canvas particle rain background rendering falling binary/ASCII characters in glowing blue and purple tones.
-* **🐚 Interactive Live Terminal Shell**: A simulated, fully functional terminal shell allowing visitors to query cohort tracks, check directories, and initialize challenges via raw shell commands (`help`, `tracks`, `about`, `start`, `clear`).
-* **🔥 Dynamic 10-Column Heatmap**: A custom-designed, Duolingo-style grid calendar replacing day numbers with glowing flame emojis (`🔥`) on completed days to showcase consistency.
+* **🔥 Dynamic 20-Column Heatmap**: A custom-designed, Duolingo-style grid calendar replacing day numbers with glowing flame emojis (`🔥`) on completed days to showcase consistency.
 * **🛡️ Futuristic Profile Dashboards**: Mac-style sub-panels displaying cohort details, social linkage statuses, and a secure crimson session disconnect controller.
 
 ---
 
 ## ⚙️ Core Technical Features
 
-### 1. Verification & Security Engine
-* **Anti-Cheat Link Detector**: Automatically validates that submitted repository and post links belong to legitimate `github.com` and `linkedin.com` domains.
-* **Duplicate Prevention**: Prevents cheating by ensuring no user can submit the same commit hash or social post URL across multiple days.
+### 1. 🔐 Authentication & Role-Based Access
 
-### 2. Live Cohort Sync
-* **Dynamic Leaderboard**: Fetches and ranks cohort members based on active streaks in real-time.
-* **Live Peer Pod**: Displays online cohort members and their latest activities to drive community accountability.
+- **End-to-End Authentication**: Secure user authentication and protected routes for the platform.
+- **Two User Roles**: Supports **Normal Users** and **Admins** with role-based access and permissions.
+- **Admin Controls**: Admins can create, update, and manage coding tasks and challenge roadmaps.
+
+### 2. 🗺️ 60-Day Challenge & Roadmaps
+
+- **Pre-Built Roadmaps**: Users can choose from structured roadmaps such as **Frontend, Backend, and Full Stack**.
+- **Day-by-Day Progress**: Users follow their selected roadmap and complete tasks sequentially throughout the 60-day challenge.
+- **Task Submission**: Users can submit their daily task work and track their challenge progress.
+
+### 3. 🏆 Ranking & Points System
+
+- **Points-Based Ranking**: Users earn points by completing and submitting daily challenges.
+- **Leaderboard**: Users are ranked based on their earned points, encouraging consistency and healthy competition.
+- **Progress Tracking**: Tracks user activity and challenge completion throughout the 60-day journey.
+
+### 4. 📱 Responsive User Experience
+
+- **Responsive UI**: Designed to provide a consistent experience across desktop, tablet, and mobile devices.
+- **User & Admin Dashboards**: Dedicated interfaces for managing challenges, roadmaps, tasks, submissions, and progress.
 
 ---
 
