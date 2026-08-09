@@ -395,12 +395,12 @@ export default function ChallengeDay() {
       </div>
 
       {/* Day Navigation */}
-      <div className="flex gap-2.5 mx-4 my-6">
+      <div className="flex gap-2.5 my-6 max-w-300 mx-auto px-5 md:px-10">
         <button className="flex-1 py-3 bg-surface-glass backdrop-blur-md border border-border rounded-xl text-fg text-xs font-bold flex items-center justify-center gap-1.5 hover:border-border-light hover:-translate-y-0.5 transition-all cursor-pointer" onClick={handlePrevDay}>
           <svg className="w-3.5 h-3.5 stroke-fg stroke-[2.5] fill-none" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
           Day {currentDayNum > 1 ? currentDayNum - 1 : 1}
         </button>
-        <button className="flex-1 py-3 bg-linear-to-r from-blue to-purple text-bg text-xs font-bold flex items-center justify-center gap-1.5 shadow-blue-glow hover:-translate-y-0.5 hover:shadow-lg transition-all cursor-pointer anim-gradient" onClick={handleNextDay}>
+        <button className="flex-1 py-3 bg-linear-to-r from-blue to-purple text-bg text-xs rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-blue-glow hover:-translate-y-0.5 hover:shadow-lg transition-all cursor-pointer anim-gradient" onClick={handleNextDay}>
           Day {currentDayNum < 60 ? currentDayNum + 1 : 60}
           <svg className="w-3.5 h-3.5 stroke-bg stroke-[2.5] fill-none" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6" /></svg>
         </button>

@@ -8,7 +8,7 @@ export default function Landing({ setMockUser }) {
   const navigate = useNavigate();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [username, setUsername] = useState('hey_rahul');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [track, setTrack] = useState('web-dev');
@@ -128,15 +128,6 @@ export default function Landing({ setMockUser }) {
         setSuccessMsg('Registration successful! Please sign in.');
         setIsSignUp(false);
       } else {
-        // Just log in
-        // const loginRes = await signIn(email, password);
-        // setShowAuthModal(false);
-        // // Admins go directly to their panel; everyone else goes to dashboard
-        // if (loginRes?.data?.role === 'admin') {
-        //   navigate('/admin');
-        // } else {
-        //   navigate('/dashboard');
-        // }
         const response = await Axios({
           ...SummaryApi.sign_in,
           data: {
@@ -524,23 +515,6 @@ export default function Landing({ setMockUser }) {
                   required
                 />
               </div>
-
-              {isSignUp && (
-                <div>
-                  <label className="text-[11px] font-bold mb-1.5 flex items-center gap-1 text-fg-muted">Choose Track</label>
-                  <select
-                    value={track}
-                    onChange={e => setTrack(e.target.value)}
-                    className="w-full px-3.5 py-3 bg-bg border border-border rounded-xl text-fg text-xs focus:outline-none focus:border-blue transition-all"
-                    style={{ fontFamily: 'inherit' }}
-                  >
-                    <option value="Full Stack">Full Stack (Web Dev)</option>
-                    <option value="Frontend">Frontend (UI/UX)</option>
-                    <option value="Backend">Backend (APIs & DB)</option>
-                    <option value="Administrator">Administrator / Teacher</option>
-                  </select>
-                </div>
-              )}
 
               <button type="submit" className="w-full py-3.5 bg-linear-to-r from-blue to-purple text-bg font-bold rounded-xl text-xs shadow-blue-glow hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 cursor-pointer anim-gradient" style={{ marginTop: '10px' }}>
                 $ {isSignUp ? 'initialize_challenge' : 'start_session'}
