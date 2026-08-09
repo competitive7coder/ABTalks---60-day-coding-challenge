@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate , useLocation } from 'react-router-dom';
 import { signUp, signIn, createChallenge } from '../api';
 import SummaryApi from '../util/SummaryApi';
 import Axios from '../util/Axios';
+import toast from 'react-hot-toast';
 
 export default function Landing({ setMockUser }) {
   const navigate = useNavigate();
+  const location = useLocation()
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [username, setUsername] = useState('');
@@ -147,13 +149,20 @@ export default function Landing({ setMockUser }) {
     }
   };
 
-  // useEffect(() => {
-  //   const isLoggedIn = localStorage.getItem("login") === "true";
+  useEffect(() => {
 
-  //   if (isLoggedIn) {
-  //     navigate("/dashboard", { replace: true });
-  //   }
-  // }, [navigate]);
+    if(location.state?.issue) {
+      // toast.error("Check you network connection!")
+      // toast.error("Or please logged-in again...")
+      return
+    }
+    const isLoggedIn = localStorage.getItem("login") === "true";
+
+    if (isLoggedIn) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
 
   return (
     <div className="min-h-screen bg-bg text-fg font-sans relative overflow-x-hidden selection:bg-blue/30 selection:text-blue">

@@ -4,11 +4,15 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import ChallengeDay from './pages/ChallengeDay';
 import AdminPanel from './pages/AdminPanel';
+import { Toaster } from 'react-hot-toast'
 import './App.css';
 
 function App() {
   return (
     <Router>
+
+      <Toaster />
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/dashboard" element={<Dashboard />} />

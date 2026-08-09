@@ -55,7 +55,14 @@ export default function ChallengeDay() {
         setSubmissions(subsRes.submissions || []);
       } catch (err) {
         console.error(err);
-        navigate('/');
+        alert('Failed to terminate session securely. Redirecting...');
+        navigate('/',
+          {
+            state: {
+              issue: true
+            }
+          }
+        );
       } finally {
         setLoading(false);
       }

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import toast from "react-hot-toast";
 
 import SummaryApi from '../util/SummaryApi';
 import Axios from '../util/Axios';
@@ -47,8 +48,13 @@ export default function Dashboard() {
       navigate("/")
     } catch (err) {
       console.error(err);
-      alert('Failed to terminate session securely. Redirecting...');
-      navigate('/');
+      navigate('/',
+        {
+          state: {
+            issue: true
+          }
+        }
+      );
     }
   };
 
@@ -103,7 +109,13 @@ export default function Dashboard() {
         setLeaderboard(leaderboardRes.data || []);
       } catch (err) {
         console.error(err);
-        navigate('/');
+        navigate('/',
+          {
+            state: {
+              issue: true
+            }
+          }
+        );
       } finally {
         setLoading(false);
       }
