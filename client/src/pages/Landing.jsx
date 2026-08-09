@@ -261,7 +261,7 @@ export default function Landing({ setMockUser }) {
 
         {/* Stats Section: Cybernetic Status Panel */}
         <div className="grid grid-cols-3 gap-3.5 py-6 px-4 bg-surface-glass backdrop-blur-xl rounded-2xl border border-border relative overflow-hidden md:max-w-225 md:mx-auto md:p-6 md:mb-10 hover:border-blue/20 transition-all duration-300">
-          <div className="absolute top-0 left-0 w-full h-[2px] bg-linear-to-r from-blue via-purple to-cyan"></div>
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-linear-to-r from-blue via-purple to-cyan"></div>
           <div className="text-center relative">
             <span className="absolute top-0 right-1 w-1 h-1 bg-green rounded-full anim-ring-pulse"></span>
             <div className="text-2xl font-black bg-linear-to-br from-blue to-purple bg-clip-text text-transparent anim-bounce-subtle">60</div>
@@ -299,7 +299,7 @@ export default function Landing({ setMockUser }) {
           <h2 className="text-base font-black text-center mb-6 relative after:content-[''] after:block after:w-10 after:h-0.5 after:bg-linear-to-r after:from-blue after:to-purple after:mx-auto after:mt-2 after:rounded uppercase tracking-wide">How It Works</h2>
           <div className="relative flex flex-col gap-5 md:grid md:grid-cols-3 md:gap-6">
             {/* Dotted path connector for large displays */}
-            <div className="hidden md:block absolute top-[28px] left-[15%] right-[15%] h-[2px] border-t-2 border-dashed border-border-light -z-1"></div>
+            <div className="hidden md:block absolute top-7 left-[15%] right-[15%] h-0.5 border-t-2 border-dashed border-border-light -z-1"></div>
 
             <div className="glass-panel rounded-2xl p-5 flex gap-3.5 items-start hover:border-blue/35 hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
               <div className="w-8.5 h-8.5 bg-linear-to-br from-blue to-purple rounded-xl flex items-center justify-center font-black text-xs text-bg shadow-blue-glow group-hover:scale-105 transition-transform duration-300">01</div>
