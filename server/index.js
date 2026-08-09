@@ -6,7 +6,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 dotenv.config()
 
-import connectDB from './config/connectDb.js'
+import connectDB from './config/connectDB.js'
 
 import challengeRoute from './routes/challenge.route.js'
 import submissionRoute from './routes/submission.route.js'
@@ -52,7 +52,7 @@ app.get("/leaderboard", auth, getLeaderboardController)
 // Route level middlewire
 app.use("/api/challenge", challengeRoute)
 app.use("/api/submission", submissionRoute)
-app.use("/api/dashboard" , dashboardRouter)
+app.use("/api/dashboard", dashboardRouter)
 app.use("/api/tasks", taskRoute)
 app.use("/api/admin", adminRoute)
 
