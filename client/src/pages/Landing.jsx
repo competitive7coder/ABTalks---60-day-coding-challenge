@@ -147,13 +147,13 @@ export default function Landing({ setMockUser }) {
     }
   };
 
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("login") === "true";
+  // useEffect(() => {
+  //   const isLoggedIn = localStorage.getItem("login") === "true";
 
-    if (isLoggedIn) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [navigate]);
+  //   if (isLoggedIn) {
+  //     navigate("/dashboard", { replace: true });
+  //   }
+  // }, [navigate]);
 
   return (
     <div className="min-h-screen bg-bg text-fg font-sans relative overflow-x-hidden selection:bg-blue/30 selection:text-blue">
