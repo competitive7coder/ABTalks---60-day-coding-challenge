@@ -3,6 +3,13 @@
 > A gamified 60-day coding challenge platform built to help developers stay consistent, follow structured roadmaps, complete daily tasks, earn points, maintain streaks, and climb the leaderboard.
 ---
 
+## 🚀 Live Demo
+
+- 🌐 **Frontend:** [ABTalks - 60 Days Coding Challenge](https://ab-talks-60-day-coding-challenge-three.vercel.app)
+- ⚙️ **Backend API:** [ABTalks API](https://abtalks-60-day-coding-challenge-2.onrender.com)
+
+> **Deployment Stack:** React/Vite frontend deployed on **Vercel** with the Node.js/Express backend deployed on **Render**.
+
 ## ## 🔑 Demo Credentials
 
 The following credentials can be used to test the different user roles in ABTalks.
@@ -90,14 +97,15 @@ ABTalks is designed with a clean, responsive, and developer-focused interface fe
    ```bash
    cd server
    npm install
-   # Create a .env file and specify MONGODB_URL, SECRET_KEY_ACCESS_TOKEN, etc.
+   # Create a .env file and specify CLIENT_URL, MONGODB_URL, SECRET_KEY_ACCESS_TOKEN,SECRET_KEY_REFRESSH_TOKEN etc.
    npm run dev
    ```
 
 3. **Frontend Client Setup**:
    ```bash
    cd ../client
-   npm install --legacy-peer-deps
+   npm install 
+   # Create a .env file and specify VITE_BACKEND_URL etc.
    npm run dev
    ```
 
